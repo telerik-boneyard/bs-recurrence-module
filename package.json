@@ -1,0 +1,10 @@
+{
+  "name": "Recurrence",
+  "version": "0.0.1",
+  "main": "Recurrence.js",
+  "private": true,
+  "plugin": {
+    "consumes": [],
+    "provides": ["Recurrence"]
+  }
+}
