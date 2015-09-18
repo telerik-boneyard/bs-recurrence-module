@@ -3,11 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="e9fb87df-b803-4511-b051-84f25303fb88" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/constants.js" afterPath="$PROJECT_DIR$/src/constants.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/package.json" afterPath="$PROJECT_DIR$/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/recurrence-test.html" afterPath="$PROJECT_DIR$/test/recurrence-test.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/recurrence-test.js" afterPath="$PROJECT_DIR$/test/recurrence-test.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/recurrence.js" afterPath="$PROJECT_DIR$/src/recurrence.js" />
     </list>
     <ignored path="recurrence.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -120,8 +115,8 @@
       <file leaf-file-name="README.md" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/README.md">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.07058824">
-              <caret line="4" column="19" selection-start-line="4" selection-start-column="19" selection-end-line="4" selection-end-column="19" />
+            <state vertical-scroll-proportion="0.2647059">
+              <caret line="15" column="99" selection-start-line="15" selection-start-column="99" selection-end-line="15" selection-end-column="99" />
               <folding />
             </state>
           </provider>
@@ -490,8 +485,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.07058824">
-          <caret line="4" column="19" selection-start-line="4" selection-start-column="19" selection-end-line="4" selection-end-column="19" />
+        <state vertical-scroll-proportion="0.2647059">
+          <caret line="15" column="99" selection-start-line="15" selection-start-column="99" selection-end-line="15" selection-end-column="99" />
           <folding />
         </state>
       </provider>
