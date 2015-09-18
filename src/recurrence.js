@@ -1,23 +1,14 @@
 'use strict';
 
 var validator = require('validator');
-var constants = require('./Constants');
+var constants = require('./constants');
 var moment = require('moment');
 
-function Recurrence(imports) {
-    this.imports = imports;
+function Recurrence() {
+
 }
 
 Recurrence.prototype = {
-    /**
-     *
-     * Initializes the module - ensures that the required plugins are loaded
-     * @param done
-     */
-    initialize: function (done) {
-        done();
-    },
-
     _makeError: function (err) {
         return {
             Success: false,
@@ -35,6 +26,43 @@ Recurrence.prototype = {
             min: min,
             max: max
         };
+    },
+
+    _next: {
+        Once: function (opts) {
+            // When once, use just the start date. In case the start date is in the past, we return now();
+            return opts.startDate;
+        },
+
+        Minutes: function (opts) {
+            return opts.startDate.add({
+                minutes: opts.interval
+            });
+        },
+
+        Hours: function (opts) {
+            return opts.startDate.add({
+                hours: opts.interval
+            });
+        },
+
+        Days: function (opts) {
+            return opts.startDate.add({
+                days: opts.interval
+            });
+        },
+
+        Weeks: function (opts) {
+            return opts.startDate.add({
+                weeks: opts.interval
+            });
+        },
+
+        Months: function (opts) {
+            return opts.startDate.add({
+                months: opts.interval
+            });
+        }
     },
 
     /**
@@ -168,56 +196,43 @@ Recurrence.prototype = {
         return nextDate.toDate();
     },
 
-    _next: {
-        Once: function (opts) {
-            // When once, use just the start date. In case the start date is in the past, we return now();
-            return opts.startDate;
-        },
+    describe: function (job) {
+        var result = [];
 
-        Minutes: function (opts) {
-            return opts.startDate.add({
-                minutes: opts.interval
-            });
-        },
+        var dateFormat = 'D/M/YYYY';
+        var startDate = moment(job.StartDate);
+        var endDate = moment(job.EndDate);
 
-        Hours: function (opts) {
-            return opts.startDate.add({
-                hours: opts.interval
-            });
-        },
-
-        Days: function (opts) {
-            return opts.startDate.add({
-                days: opts.interval
-            });
-        },
-
-        Weeks: function (opts) {
-            return opts.startDate.add({
-                weeks: opts.interval
-            });
-        },
-
-        Months: function (opts) {
-            return opts.startDate.add({
-                months: opts.interval
-            });
+        function insertTimestamp(commaAfterToday, commaAfterHours) {
+            if (startDate.isSame(moment(), 'day')) {
+                result.push('Today' + (commaAfterToday ? ',' : ''));
+                var todayHours = startDate.format('h:mm');
+                result.push(todayHours + (commaAfterHours ? ',' : ''));
+            } else {
+                var formattedExecutionDate = startDate.format(dateFormat);
+                result.push(formattedExecutionDate);
+            }
         }
+
+        if (job.Recurrence.Type === constants.Type.Once) {
+            result.push('Single execution scheduled for');
+            insertTimestamp();
+        } else {
+            result.push('Every');
+            result.push(job.Recurrence.Interval);
+            result.push(constants.TypeString[job.Recurrence.Type].toLowerCase());
+            result.push('from');
+            insertTimestamp(true, true);
+            result.push('until');
+
+            var formattedEndDate = endDate.format(dateFormat);
+            result.push(formattedEndDate);
+        }
+
+        return result.join(' ');
     },
 
     Constants: constants
 };
 
-/**
- * Sets up the recurrence plugin
- * @param options
- * @param imports
- * @param register
- */
-module.exports = function setup(options, imports, register) {
-    var instance = new Recurrence(imports);
-
-    register(null, {
-        Recurrence: instance
-    });
-};
+module.exports = new Recurrence();
