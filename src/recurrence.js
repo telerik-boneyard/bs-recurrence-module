@@ -197,45 +197,69 @@ Recurrence.prototype = {
     },
 
     describe: function (job) {
-        var result = [];
+        var describedJob = [];
 
         var dateFormat = 'D/M/YYYY';
         var hoursFormat = 'h:mm';
         var notSet = 'Not set';
 
         var startDate = moment(job.StartDate);
-        var endDate = moment(job.EndDate);
+        var endDate = moment(job.EndValue);
 
-        function insertStartTimestamp(commaAfterToday, commaAfterHours) {
+        function tryInsertComma(shouldInsert) {
+            return shouldInsert ? ',' : '';
+        }
+
+        function getStartTimestamp(commaAfterToday, commaAfterHours, commaAfterDayString) {
+            var startTimestamp = [];
+
             if (!job.StartDate) {
-                return result.push(notSet);
+                startTimestamp.push(notSet);
+                return startTimestamp;
             }
 
             if (startDate.isSame(moment(), 'day')) {
-                result.push('Today' + (commaAfterToday ? ',' : ''));
+                startTimestamp.push('Today' + tryInsertComma(commaAfterToday));
                 var todayHours = startDate.format(hoursFormat);
-                result.push(todayHours + (commaAfterHours ? ',' : ''));
+                startTimestamp.push(todayHours + tryInsertComma(commaAfterHours));
             } else {
                 var formattedExecutionDate = startDate.format(dateFormat);
-                result.push(formattedExecutionDate);
+                startTimestamp.push(formattedExecutionDate);
             }
 
             if (job.Recurrence.Type === constants.Type.Weeks ||
                 job.Recurrence.Type === constants.Type.Months) {
-                result.push('on');
+                startTimestamp.push('on');
 
                 var dayString = dayToString(job.Recurrence.Day, job.Recurrence.Type);
-                result.push(dayString + ',');
+                startTimestamp.push(dayString + tryInsertComma(commaAfterDayString));
             }
+
+            return startTimestamp;
         }
 
-        function insertEndTimestamp() {
-            if (!job.EndDate) {
-                return result.push(notSet);
+        function getEndTimestamp() {
+            var endTimestamp = [];
+
+            if (job.EndType === constants.EndType.Unlimited) {
+                return endTimestamp;
+            } else {
+                endTimestamp.push('until');
             }
 
-            var formattedEndDate = endDate.format(dateFormat);
-            result.push(formattedEndDate);
+            if (!job.EndValue) {
+                endTimestamp.push(notSet);
+                return endTimestamp;
+            }
+
+            if (job.EndType === constants.EndType.EndDate) {
+                var formattedEndDate = endDate.format(dateFormat);
+                endTimestamp.push(formattedEndDate);
+            } else if (job.EndType === constants.EndType.NumberOfOccurences) {
+                endTimestamp.push('after ' + job.EndValue + ' occurrences');
+            }
+
+            return endTimestamp;
         }
 
         function dayToString(day, type) {
@@ -258,21 +282,22 @@ Recurrence.prototype = {
         }
 
         if (job.Recurrence.Type === constants.Type.Once) {
-            result.push('Single execution scheduled for');
-            insertStartTimestamp();
+            describedJob.push('Single execution scheduled for');
+            var startTimestampOnce = getStartTimestamp();
+            describedJob = describedJob.concat(startTimestampOnce);
         } else {
-            result.push('Every');
-            result.push(job.Recurrence.Interval || notSet);
-            result.push(constants.TypeString[job.Recurrence.Type].toLowerCase());
-            result.push('from');
-            insertStartTimestamp(true, true);
+            describedJob.push('Every');
+            describedJob.push(job.Recurrence.Interval || notSet);
+            describedJob.push(constants.TypeString[job.Recurrence.Type].toLowerCase());
+            describedJob.push('from');
+            var endTimestamp = getEndTimestamp();
+            var insertCommaAfterDay = !!endTimestamp.length;
+            var startTimestamp = getStartTimestamp(true, true, insertCommaAfterDay);
 
-            result.push('until');
-
-            insertEndTimestamp();
+            describedJob = describedJob.concat(startTimestamp).concat(endTimestamp);
         }
 
-        return result.join(' ');
+        return describedJob.join(' ');
     },
 
     Constants: constants

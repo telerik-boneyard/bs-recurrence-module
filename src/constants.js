@@ -11,6 +11,11 @@ var type = {
 
 exports = module.exports = {
     Type: type,
+    EndType: {
+        Unlimited: 1,
+        NumberOfOccurences: 2,
+        EndDate: 3
+    },
 
     TypeString: _.invert(type)
 };

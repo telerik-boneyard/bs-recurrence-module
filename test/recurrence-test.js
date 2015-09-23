@@ -295,8 +295,9 @@ suite('describe', function () {
                 Type: recurrence.Constants.Type.Minutes,
                 Interval: 5
             },
-            StartDate: moment().hours(8).minutes(20).toDate(),
-            EndDate: moment('8/9/2015', 'D/M/YYYY').toDate()
+            EndType: recurrence.Constants.EndType.EndDate,
+            EndValue: moment('8/9/2015', 'D/M/YYYY').toDate(),
+            StartDate: moment().hours(8).minutes(20).toDate()
         }, this.test.title);
     });
 
@@ -316,8 +317,9 @@ suite('describe', function () {
                 Interval: 16,
                 Day: 3
             },
-            StartDate: moment('10/12/2016', 'D/M/YYYY').toDate(),
-            EndDate: moment('15/12/2017', 'D/M/YYYY').toDate()
+            EndType: recurrence.Constants.EndType.EndDate,
+            EndValue: moment('15/12/2017', 'D/M/YYYY').toDate(),
+            StartDate: moment('10/12/2016', 'D/M/YYYY').toDate()
         }, this.test.title);
     });
 
@@ -328,8 +330,9 @@ suite('describe', function () {
                 Interval: 6,
                 Day: 1
             },
-            StartDate: moment('5/11/2015', 'D/M/YYYY').toDate(),
-            EndDate: moment('6/11/2015', 'D/M/YYYY').toDate()
+            EndType: recurrence.Constants.EndType.EndDate,
+            EndValue: moment('6/11/2015', 'D/M/YYYY').toDate(),
+            StartDate: moment('5/11/2015', 'D/M/YYYY').toDate()
         }, this.test.title);
     });
 
@@ -350,7 +353,8 @@ suite('describe', function () {
                 Type: recurrence.Constants.Type.Months,
                 Interval: 6
             },
-            EndDate: moment('6/11/2015', 'D/M/YYYY').toDate()
+            EndType: recurrence.Constants.EndType.EndDate,
+            EndValue: moment('6/11/2015', 'D/M/YYYY').toDate()
         }, this.test.title)
     });
 
@@ -361,6 +365,42 @@ suite('describe', function () {
                 Interval: 6
             },
             StartDate: moment('5/11/2015', 'D/M/YYYY').toDate()
+        }, this.test.title);
+    });
+
+    test('Every 6 months from 5/11/2015 on Not set, until after 5 occurrences', function () {
+        testDescribe({
+            Recurrence: {
+                Type: recurrence.Constants.Type.Months,
+                Interval: 6
+            },
+            StartDate: moment('5/11/2015', 'D/M/YYYY').toDate(),
+            EndType: recurrence.Constants.EndType.NumberOfOccurences,
+            EndValue: 5
+        }, this.test.title);
+    });
+
+    test('Every 6 months from 5/11/2015 on Not set, until after 5 occurrences', function () {
+        testDescribe({
+            Recurrence: {
+                Type: recurrence.Constants.Type.Months,
+                Interval: 6
+            },
+            StartDate: moment('5/11/2015', 'D/M/YYYY').toDate(),
+            EndType: recurrence.Constants.EndType.NumberOfOccurences,
+            EndValue: 5
+        }, this.test.title);
+    });
+
+    test('Every 6 months from 5/11/2015 on 28th', function () {
+        testDescribe({
+            Recurrence: {
+                Type: recurrence.Constants.Type.Months,
+                Interval: 6,
+                Day: 28
+            },
+            StartDate: moment('5/11/2015', 'D/M/YYYY').toDate(),
+            EndType: recurrence.Constants.EndType.Unlimited
         }, this.test.title);
     });
 });
