@@ -309,34 +309,36 @@ suite('describe', function () {
         }, this.test.title);
     });
 
-    test('Every 16 weeks from 10/12/2016 until 15/12/2017', function () {
+    test('Every 16 weeks from 10/12/2016 on Wed, until 15/12/2017', function () {
         testDescribe({
             Recurrence: {
                 Type: recurrence.Constants.Type.Weeks,
                 Interval: 16,
-                Day: 16
+                Day: 3
             },
             StartDate: moment('10/12/2016', 'D/M/YYYY').toDate(),
             EndDate: moment('15/12/2017', 'D/M/YYYY').toDate()
         }, this.test.title);
     });
 
-    test('Every 6 months from 5/11/2015 until 6/11/2015', function () {
+    test('Every 6 months from 5/11/2015 on 1st, until 6/11/2015', function () {
         testDescribe({
             Recurrence: {
                 Type: recurrence.Constants.Type.Months,
-                Interval: 6
+                Interval: 6,
+                Day: 1
             },
             StartDate: moment('5/11/2015', 'D/M/YYYY').toDate(),
             EndDate: moment('6/11/2015', 'D/M/YYYY').toDate()
         }, this.test.title);
     });
 
-    test('Every 6 months from 5/11/2015 until Not set', function () {
+    test('Every 6 months from 5/11/2015 on 2nd, until Not set', function () {
         testDescribe({
             Recurrence: {
                 Type: recurrence.Constants.Type.Months,
-                Interval: 6
+                Interval: 6,
+                Day: 2
             },
             StartDate: moment('5/11/2015', 'D/M/YYYY').toDate()
         }, this.test.title);
@@ -350,5 +352,15 @@ suite('describe', function () {
             },
             EndDate: moment('6/11/2015', 'D/M/YYYY').toDate()
         }, this.test.title)
+    });
+
+    test('Every 6 months from 5/11/2015 on Not set, until Not set', function () {
+        testDescribe({
+            Recurrence: {
+                Type: recurrence.Constants.Type.Months,
+                Interval: 6
+            },
+            StartDate: moment('5/11/2015', 'D/M/YYYY').toDate()
+        }, this.test.title);
     });
 });

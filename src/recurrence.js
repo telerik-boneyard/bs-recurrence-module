@@ -219,6 +219,14 @@ Recurrence.prototype = {
                 var formattedExecutionDate = startDate.format(dateFormat);
                 result.push(formattedExecutionDate);
             }
+
+            if (job.Recurrence.Type === constants.Type.Weeks ||
+                job.Recurrence.Type === constants.Type.Months) {
+                result.push('on');
+
+                var dayString = dayToString(job.Recurrence.Day, job.Recurrence.Type);
+                result.push(dayString + ',');
+            }
         }
 
         function insertEndTimestamp() {
@@ -230,6 +238,25 @@ Recurrence.prototype = {
             result.push(formattedEndDate);
         }
 
+        function dayToString(day, type) {
+            if (!day) {
+                return notSet;
+            }
+
+            var localeData = moment().localeData();
+
+            if (type === constants.Type.Months) {
+                return localeData.ordinal(day);
+            }
+
+            //week
+            return localeData.weekdaysShort({
+                day: function () {
+                    return day; //well this is the best I found in the docs.
+                }
+            })
+        }
+
         if (job.Recurrence.Type === constants.Type.Once) {
             result.push('Single execution scheduled for');
             insertStartTimestamp();
@@ -239,6 +266,7 @@ Recurrence.prototype = {
             result.push(constants.TypeString[job.Recurrence.Type].toLowerCase());
             result.push('from');
             insertStartTimestamp(true, true);
+
             result.push('until');
 
             insertEndTimestamp();
