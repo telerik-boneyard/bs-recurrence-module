@@ -292,8 +292,17 @@ Recurrence.prototype = {
             describedJob = describedJob.concat(startTimestampOnce);
         } else {
             describedJob.push('Every');
-            describedJob.push(job.Recurrence.Interval || notSet);
-            describedJob.push(constants.TypeString[job.Recurrence.Type].toLowerCase());
+
+            var type = constants.TypeString[job.Recurrence.Type].toLowerCase();
+            if (job.Recurrence.Interval === 1) {
+                //every day, month etc.
+                var singularType = type.substring(0, type.length - 1);
+                describedJob.push(singularType);
+            } else {
+                describedJob.push(job.Recurrence.Interval || notSet);
+                describedJob.push(type);
+            }
+
             describedJob.push('from');
             var endTimestamp = getEndTimestamp();
             var commaAfterDay = !!endTimestamp.length;

@@ -417,7 +417,7 @@ suite('describe', function () {
         }, this.test.title);
     });
 
-    test('Every 1 days from Today, 9:29', function () {
+    test('Every day from Today, 9:29', function () {
         testDescribe({
             Recurrence: {
                 Type: recurrence.Constants.Type.Days,
