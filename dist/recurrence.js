@@ -16597,7 +16597,7 @@ Recurrence.prototype = {
             insertStartTimestamp();
         } else {
             result.push('Every');
-            result.push(job.Recurrence.Interval);
+            result.push(job.Recurrence.Interval || notSet);
             result.push(constants.TypeString[job.Recurrence.Type].toLowerCase());
             result.push('from');
             insertStartTimestamp(true, true);
