@@ -221,7 +221,7 @@ Recurrence.prototype = {
             if (startDate.isSame(moment(), 'day')) {
                 startTimestamp.push('Today' + tryInsertComma(commaAfterToday));
                 var todayHours = startDate.format(hoursFormat);
-                startTimestamp.push(todayHours + tryInsertComma(commaAfterHours));
+                startTimestamp.push(todayHours + tryInsertComma(commaAfterHours && job.EndType !== constants.EndType.Unlimited));
             } else {
                 var formattedExecutionDate = startDate.format(dateFormat);
                 startTimestamp.push(formattedExecutionDate);

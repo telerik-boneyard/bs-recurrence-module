@@ -416,4 +416,15 @@ suite('describe', function () {
             StartDate: moment().hours(9).minutes(29).toDate()
         }, this.test.title);
     });
+
+    test('Every 1 days from Today, 9:29', function () {
+        testDescribe({
+            Recurrence: {
+                Type: recurrence.Constants.Type.Days,
+                Interval: 1
+            },
+            EndType: recurrence.Constants.EndType.Unlimited,
+            StartDate: moment().hours(9).minutes(29).toDate()
+        }, this.test.title);
+    });
 });
