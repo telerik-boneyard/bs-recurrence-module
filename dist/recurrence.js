@@ -16562,13 +16562,20 @@ Recurrence.prototype = {
         var result = [];
 
         var dateFormat = 'D/M/YYYY';
+        var hoursFormat = 'h:mm';
+        var notSet = 'Not set';
+
         var startDate = moment(job.StartDate);
         var endDate = moment(job.EndDate);
 
-        function insertTimestamp(commaAfterToday, commaAfterHours) {
+        function insertStartTimestamp(commaAfterToday, commaAfterHours) {
+            if (!job.StartDate) {
+                return result.push(notSet);
+            }
+
             if (startDate.isSame(moment(), 'day')) {
                 result.push('Today' + (commaAfterToday ? ',' : ''));
-                var todayHours = startDate.format('h:mm');
+                var todayHours = startDate.format(hoursFormat);
                 result.push(todayHours + (commaAfterHours ? ',' : ''));
             } else {
                 var formattedExecutionDate = startDate.format(dateFormat);
@@ -16576,19 +16583,27 @@ Recurrence.prototype = {
             }
         }
 
+        function insertEndTimestamp() {
+            if (!job.EndDate) {
+                return result.push(notSet);
+            }
+
+            var formattedEndDate = endDate.format(dateFormat);
+            result.push(formattedEndDate);
+        }
+
         if (job.Recurrence.Type === constants.Type.Once) {
             result.push('Single execution scheduled for');
-            insertTimestamp();
+            insertStartTimestamp();
         } else {
             result.push('Every');
             result.push(job.Recurrence.Interval);
             result.push(constants.TypeString[job.Recurrence.Type].toLowerCase());
             result.push('from');
-            insertTimestamp(true, true);
+            insertStartTimestamp(true, true);
             result.push('until');
 
-            var formattedEndDate = endDate.format(dateFormat);
-            result.push(formattedEndDate);
+            insertEndTimestamp();
         }
 
         return result.join(' ');

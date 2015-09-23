@@ -329,6 +329,26 @@ suite('describe', function () {
             },
             StartDate: moment('5/11/2015', 'D/M/YYYY').toDate(),
             EndDate: moment('6/11/2015', 'D/M/YYYY').toDate()
+        }, this.test.title);
+    });
+
+    test('Every 6 months from 5/11/2015 until Not set', function () {
+        testDescribe({
+            Recurrence: {
+                Type: recurrence.Constants.Type.Months,
+                Interval: 6
+            },
+            StartDate: moment('5/11/2015', 'D/M/YYYY').toDate()
+        }, this.test.title);
+    });
+
+    test('Every 6 months from Not set until 6/11/2015', function () {
+        testDescribe({
+            Recurrence: {
+                Type: recurrence.Constants.Type.Months,
+                Interval: 6
+            },
+            EndDate: moment('6/11/2015', 'D/M/YYYY').toDate()
         }, this.test.title)
     });
 });
