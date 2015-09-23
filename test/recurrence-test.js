@@ -289,7 +289,7 @@ suite('describe', function () {
         res.should.be.exactly(exp);
     };
 
-    test('Every 5 minutes from Today, 8:20, until 8/9/2015', function () {
+    test('Every 5 minutes from Today 8:20, until 8/9/2015', function () {
         testDescribe({
             Recurrence: {
                 Type: recurrence.Constants.Type.Minutes,
@@ -401,6 +401,19 @@ suite('describe', function () {
             },
             StartDate: moment('5/11/2015', 'D/M/YYYY').toDate(),
             EndType: recurrence.Constants.EndType.Unlimited
+        }, this.test.title);
+    });
+
+    test('Every 3 months from Today 9:29 on 3rd, until after 1 occurrences', function () {
+        testDescribe({
+            Recurrence: {
+                Type: recurrence.Constants.Type.Months,
+                Interval: 3,
+                Day: 3
+            },
+            EndType: recurrence.Constants.EndType.NumberOfOccurences,
+            EndValue: 1,
+            StartDate: moment().hours(9).minutes(29).toDate()
         }, this.test.title);
     });
 });

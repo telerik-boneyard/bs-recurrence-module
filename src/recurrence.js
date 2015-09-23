@@ -233,6 +233,11 @@ Recurrence.prototype = {
 
                 var dayString = dayToString(job.Recurrence.Day, job.Recurrence.Type);
                 startTimestamp.push(dayString + tryInsertComma(commaAfterDayString));
+            } else {
+                if (commaAfterDayString) {
+                    //we should insert a comma after all
+                    startTimestamp[startTimestamp.length - 1] = startTimestamp[startTimestamp.length - 1] + ',';
+                }
             }
 
             return startTimestamp;
@@ -291,8 +296,11 @@ Recurrence.prototype = {
             describedJob.push(constants.TypeString[job.Recurrence.Type].toLowerCase());
             describedJob.push('from');
             var endTimestamp = getEndTimestamp();
-            var insertCommaAfterDay = !!endTimestamp.length;
-            var startTimestamp = getStartTimestamp(true, true, insertCommaAfterDay);
+            var commaAfterDay = !!endTimestamp.length;
+            var commaAfterToday = !commaAfterDay;
+            var commaAfterHours = !commaAfterDay;
+
+            var startTimestamp = getStartTimestamp(commaAfterToday, commaAfterHours, commaAfterDay);
 
             describedJob = describedJob.concat(startTimestamp).concat(endTimestamp);
         }
