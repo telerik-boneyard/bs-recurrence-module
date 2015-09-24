@@ -16395,38 +16395,42 @@ Recurrence.prototype = {
         };
     },
 
+    _now: function() {
+        return moment();
+    },
+
     _next: {
         Once: function (opts) {
             // When once, use just the start date. In case the start date is in the past, we return now();
-            return opts.startDate;
+            return opts.fromMoment;
         },
 
         Minutes: function (opts) {
-            return opts.startDate.add({
+            return opts.fromMoment.add({
                 minutes: opts.interval
             });
         },
 
         Hours: function (opts) {
-            return opts.startDate.add({
+            return opts.fromMoment.add({
                 hours: opts.interval
             });
         },
 
         Days: function (opts) {
-            return opts.startDate.add({
+            return opts.fromMoment.add({
                 days: opts.interval
             });
         },
 
         Weeks: function (opts) {
-            return opts.startDate.add({
+            return opts.fromMoment.add({
                 weeks: opts.interval
             });
         },
 
         Months: function (opts) {
-            return opts.startDate.add({
+            return opts.fromMoment.add({
                 months: opts.interval
             });
         }
@@ -16482,7 +16486,7 @@ Recurrence.prototype = {
         };
     },
 
-    getFirstOccurrence: function (rec, startDate) {
+    _getFirstOccurrence: function (rec, startDate) {
         startDate = moment(startDate);
 
         /**
@@ -16524,25 +16528,29 @@ Recurrence.prototype = {
         }
     },
 
-    next: function (rec, _startDate) {
+    next: function (rec, from, isFirst) {
         var validationResult = this.validate(rec);
         if (!validationResult.Success) {
             throw new Error('Cannot calculate next on an invalid recurrence. ' + validationResult.ErrorMessage);
         }
 
-        var now = moment();
-        var startDate = moment(_startDate);
+        if(isFirst) {
+            return this._getFirstOccurrence(rec, from);
+        }
+
+        var now = this._now();
+        var fromMoment = moment(from);
 
         // the start date has passed so we must schedule from the current time
-        if (now.isAfter(startDate)) {
-            startDate = now;
+        if (now.isAfter(from)) {
+            fromMoment = now;
         }
 
         var options = {
             type: rec.Type,
             interval: rec.Interval,
             day: rec.Day,
-            startDate: startDate
+            fromMoment: fromMoment
         };
 
         var typeName = constants.TypeString[options.type];
@@ -16554,8 +16562,8 @@ Recurrence.prototype = {
         if (options.type === constants.Type.Days ||
             options.type === constants.Type.Weeks ||
             options.type === constants.Type.Months) {
-            nextDate = nextDate.minutes(_startDate.getMinutes())
-                .hours(_startDate.getHours());
+            nextDate = nextDate.minutes(from.getMinutes())
+                .hours(from.getHours());
 
             // TODO: For near future add some check if somehow the Day have not moved...
         }
