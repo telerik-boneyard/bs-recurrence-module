@@ -28,38 +28,42 @@ Recurrence.prototype = {
         };
     },
 
+    _now: function() {
+        return moment();
+    },
+
     _next: {
         Once: function (opts) {
             // When once, use just the start date. In case the start date is in the past, we return now();
-            return opts.startDate;
+            return opts.fromMoment;
         },
 
         Minutes: function (opts) {
-            return opts.startDate.add({
+            return opts.fromMoment.add({
                 minutes: opts.interval
             });
         },
 
         Hours: function (opts) {
-            return opts.startDate.add({
+            return opts.fromMoment.add({
                 hours: opts.interval
             });
         },
 
         Days: function (opts) {
-            return opts.startDate.add({
+            return opts.fromMoment.add({
                 days: opts.interval
             });
         },
 
         Weeks: function (opts) {
-            return opts.startDate.add({
+            return opts.fromMoment.add({
                 weeks: opts.interval
             });
         },
 
         Months: function (opts) {
-            return opts.startDate.add({
+            return opts.fromMoment.add({
                 months: opts.interval
             });
         }
@@ -167,19 +171,19 @@ Recurrence.prototype = {
             return this._getFirstOccurrence(rec, from);
         }
 
-        var now = moment();
-        var startDate = moment(from);
+        var now = this._now();
+        var fromMoment = moment(from);
 
         // the start date has passed so we must schedule from the current time
-        if (now.isAfter(startDate)) {
-            startDate = now;
+        if (now.isAfter(from)) {
+            fromMoment = now;
         }
 
         var options = {
             type: rec.Type,
             interval: rec.Interval,
             day: rec.Day,
-            startDate: startDate
+            fromMoment: fromMoment
         };
 
         var typeName = constants.TypeString[options.type];
