@@ -16482,7 +16482,7 @@ Recurrence.prototype = {
         };
     },
 
-    getFirstOccurrence: function (rec, startDate) {
+    _getFirstOccurrence: function (rec, startDate) {
         startDate = moment(startDate);
 
         /**
@@ -16524,14 +16524,18 @@ Recurrence.prototype = {
         }
     },
 
-    next: function (rec, _startDate) {
+    next: function (rec, from, isFirst) {
         var validationResult = this.validate(rec);
         if (!validationResult.Success) {
             throw new Error('Cannot calculate next on an invalid recurrence. ' + validationResult.ErrorMessage);
         }
 
+        if(isFirst) {
+            return this._getFirstOccurrence(rec, from);
+        }
+
         var now = moment();
-        var startDate = moment(_startDate);
+        var startDate = moment(from);
 
         // the start date has passed so we must schedule from the current time
         if (now.isAfter(startDate)) {
@@ -16554,8 +16558,8 @@ Recurrence.prototype = {
         if (options.type === constants.Type.Days ||
             options.type === constants.Type.Weeks ||
             options.type === constants.Type.Months) {
-            nextDate = nextDate.minutes(_startDate.getMinutes())
-                .hours(_startDate.getHours());
+            nextDate = nextDate.minutes(from.getMinutes())
+                .hours(from.getHours());
 
             // TODO: For near future add some check if somehow the Day have not moved...
         }
