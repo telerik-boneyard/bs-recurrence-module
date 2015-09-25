@@ -35,29 +35,6 @@ var returnDate = function returnDate(date) {
 // Now is Sep 23 2015, 10:30 AM UTC
 recurrence._now = getNow;
 
-var getNextOccurrence = function (start, interval, type) {
-    var units = {
-        1: 'm',
-        2: 'h',
-        3: 'd',
-        4: 'w',
-        5: 'M'
-    };
-    var unit = units[type];
-    var nextExecutionTime = moment(start).add(interval, unit).toDate();
-    return nextExecutionTime;
-};
-
-var compareFirstOccurrence = function (rec, exp) {
-    var res = moment(recurrence.next(rec, exp, true)).startOf('minute').toDate();
-    res.should.deepEqual(exp);
-};
-
-var compareNextOccurrence = function (rec, exp, start) {
-    var res = moment(recurrence.next(rec, start)).startOf('minute').toDate();
-    res.should.deepEqual(exp);
-};
-
 var compareFirst = function(rec, fromDate, fromTime, expected) {
     var actual = moment( recurrence.next(rec, fromDate, fromTime, true)).startOf('minute').toDate();
     actual.should.deepEqual(expected);
@@ -246,36 +223,20 @@ suite('recurrence - happy path', function () {
         });
     });
 
-    suite('Once - on New Year\'s Eve', function () {
-        var rec = {};
-        rec.Type = 0;
+    suite('Once with passed date and time - must execute immediately', function () {
+        var rec = {
+            Type: 0 // once
+        };
 
-        var startDate = getNow().startOf('minutes').toDate();
+        var startDate = getNow();
+        var startTime = getStartTime(0, 0);
 
-        var firstExpectedExecution = startDate;
-        test('First occurrence should be at ' + firstExpectedExecution, function () {
-            compareFirstOccurrence(rec, firstExpectedExecution);
+        var d1 = getDate(2015, 8, 23, 0, 0);
+        test('First occurrence should be at Sep 23 2015, 00:00 PM (Today)', function () {
+            compareFirst(rec, startDate, startTime, d1);
         });
 
-        var occurrence2 = getNextOccurrence(firstExpectedExecution, rec.Interval, rec.Type);
-        test('Next occurrence should be at ' + occurrence2, function () {
-            compareNextOccurrence(rec, occurrence2, firstExpectedExecution);
-        });
-
-        var occurrence3 = getNextOccurrence(occurrence2, rec.Interval, rec.Type);
-        test('Next occurrence should be at ' + occurrence3, function () {
-            compareNextOccurrence(rec, occurrence3, occurrence2);
-        });
-
-        var occurrence4 = getNextOccurrence(occurrence3, rec.Interval, rec.Type);
-        test('Next occurrence should be at ' + occurrence4, function () {
-            compareNextOccurrence(rec, occurrence4, occurrence3);
-        });
-
-        var occurrence5 = getNextOccurrence(occurrence4, rec.Interval, rec.Type);
-        test('Next occurrence should be at ' + occurrence5, function () {
-            compareNextOccurrence(rec, occurrence5, occurrence4);
-        });
+        // TODO: test('Once: now is before the execution start time.')
     });
 
     suite('Improvements', function() {
@@ -283,11 +244,13 @@ suite('recurrence - happy path', function () {
             Type: recurrence.Constants.Type.Once,
             Day: 1
         };
-        var startDate = moment().startOf('minutes');
 
         test('Once, Date.Now + 2 mins, First Occurrence check', function() {
-            var date = startDate.add({minutes: 2 }).toDate();
-            compareFirstOccurrence(rec, date, date);
+            var startDate = getNow();
+            var startTime = getStartTime( startDate.hour(), startDate.minutes() + 2);
+
+            var date = getNow().add({minutes: 2 }).toDate();
+            compareFirst(rec, startDate, startTime, date);
         });
 
         test('Before 3 hours, On every hour, Must schedule for 11:00', function() {
