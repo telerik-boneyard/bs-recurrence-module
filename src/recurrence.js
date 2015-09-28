@@ -82,7 +82,7 @@ Recurrence.prototype = {
         };
     },
 
-    _getMomentUnit: function (type) {
+    getMomentUnit: function (type) {
         var units = {
             1: 'm',
             2: 'h',
@@ -123,11 +123,11 @@ Recurrence.prototype = {
                 iterationsCount++;
                 if (iterationsCount > iterationsThreshold) {
                     throw new Error('Cannot calculate next time for: ' + JSON.stringify(rec) + ' with start date ' +
-                        startDate);
+                        fromDate);
                 }
             }
 
-            return fromDate.toDate();
+            return fromDate.startOf('minute').toDate();
         };
 
         switch (rec.Type) {
@@ -142,7 +142,7 @@ Recurrence.prototype = {
                 });
 
             default:
-                return fromDate.toDate();
+                return fromDate.startOf('minute').toDate();
         }
     },
 
@@ -166,7 +166,7 @@ Recurrence.prototype = {
             return fromMoment;
         }
 
-        var momentUnit = this._getMomentUnit(rec.Type);
+        var momentUnit = this.getMomentUnit(rec.Type);
 
         var findNextScheduledTime = function (from, momentUnit) {
             var iterationsCount = 0;
