@@ -7,232 +7,236 @@ if (typeof window === 'undefined') {
 var getNow = function getNow() {
     return moment({
         year: 2015,
-        month: 9,
+        month: 8,
         day: 23,
         hour: 10,
         minute: 30
     });
 };
 
+var getDate = function getDate(year, month, day, hour, minute) {
+    var d = moment({
+        year: year,
+        month: month,
+        day: day,
+        hour: hour,
+        minute: minute
+    });
+
+    return d.toDate();
+};
+
+var returnDate = function returnDate(date) {
+    return function() {
+        return date;
+    }
+};
+
 // Now is Sep 23 2015, 10:30 AM UTC
-recurrence._now = function() {
-    return getNow();
+recurrence._now = getNow;
+
+var compareFirst = function(rec, fromDate, fromTime, expected) {
+    var actual = moment( recurrence.next(rec, fromDate, fromTime, true)).startOf('minute').toDate();
+    actual.should.deepEqual(expected);
 };
 
-var getNextOccurrence = function (start, interval, type) {
-    var units = {
-        1: 'm',
-        2: 'h',
-        3: 'd',
-        4: 'w',
-        5: 'M'
-    };
-    var unit = units[type];
-    var nextExecutionTime = moment(start).add(interval, unit).toDate();
-    return nextExecutionTime;
+var compareNext = function(rec, fromDate, fromTime, expected) {
+    var actual = moment( recurrence.next(rec, fromDate, fromTime, false)).startOf('minute').toDate();
+    actual.should.deepEqual(expected);
 };
 
-var compareFirstOccurrence = function (rec, exp) {
-    var res = moment(recurrence.next(rec, exp, true)).startOf('minute').toDate();
-    res.should.deepEqual(exp);
+var getStartTime = function(hours, minutes) {
+    return hours * 60 + minutes;
 };
 
-var compareNextOccurrence = function (rec, exp, start) {
-    var res = moment(recurrence.next(rec, start)).startOf('minute').toDate();
-    res.should.deepEqual(exp);
-};
+suite('recurrence - happy path', function () {
+    // runs before every test and clears the get_now
+    setup(function() {
+        recurrence._now = getNow;
+    });
 
-suite('recurrence', function () {
     suite('Every 3 hours starts at 18:25', function () {
-        var rec = {};
-        rec.Type = 2;
-        rec.Interval = 3;
-        rec.Day = 1;
-        var startDate = getNow().startOf('minutes').toDate();
+        var rec = {
+            Type: 2, // Hours
+            Interval: 3
+        };
+        var startDate = getNow().startOf('day').toDate();
+        var startTime = getStartTime(18, 25);
 
-        test('First occurrence should be at ' + startDate, function () {
-            compareFirstOccurrence(rec, startDate, startDate);
+        var d1 = getDate(2015, 8, 23, 18, 25);
+        test('First occurrence should be at Sep 23 2015, 18:25 PM', function () {
+            compareFirst(rec, startDate, startTime, d1);
         });
 
-        var occurrence2 = getNextOccurrence(startDate, rec.Interval, rec.Type);
-        test('Next occurrence should be at ' + occurrence2, function () {
-            compareNextOccurrence(rec, occurrence2, startDate);
+
+        var d2 = getDate(2015, 8, 23, 21, 25);
+        test('Next occurrence should be at occurrence should be at Sep 23 2015, 21:25 PM', function () {
+            recurrence._now = returnDate(d1);
+            compareNext(rec, d1, startTime, d2);
         });
 
-        var occurrence3 = getNextOccurrence(occurrence2, rec.Interval, rec.Type);
-        test('Next occurrence should be at ' + occurrence3, function () {
-            compareNextOccurrence(rec, occurrence3, occurrence2);
+        var d3 = getDate(2015, 8, 24, 0, 25);
+        test('Next occurrence should be at occurrence should be at Sep 24 2015, 00:25 AM', function () {
+            recurrence._now = returnDate(d2);
+            compareNext(rec, d2, startTime, d3);
         });
 
-        var occurrence4 = getNextOccurrence(occurrence3, rec.Interval, rec.Type);
-        test('Next occurrence should be at ' + occurrence4, function () {
-            compareNextOccurrence(rec, occurrence4, occurrence3);
-        });
-
-        var occurrence5 = getNextOccurrence(occurrence4, rec.Interval, rec.Type);
-        test('Next occurrence should be at ' + occurrence5, function () {
-            compareNextOccurrence(rec, occurrence5, occurrence4);
+        var d4 = getDate(2015, 8, 24, 3, 25);
+        test('Next occurrence should be at occurrence should be at Sep 24 2015, 03:25 AM', function () {
+            recurrence._now = returnDate(d3);
+            compareNext(rec, d3, startTime, d4);
         });
     });
 
     suite('Every 45 minutes starts at 10:41', function () {
-        var rec = {};
-        rec.Type = 1;
-        rec.Interval = 45;
-        rec.Day = 1;
+        var rec = {
+            Type: 1, // minutes
+            Interval: 45
+        };
         var startDate = getNow().startOf('minutes').toDate();
+        var startTime = getStartTime(10, 41);
 
-        test('First occurrence should be at ' + startDate, function () {
-            compareFirstOccurrence(rec, startDate);
+        var d1 = getDate(2015, 8, 23, 10, 41);
+        test('First occurrence should be at Sep 23 2015, 10:41 PM', function () {
+            compareFirst(rec, startDate, startTime, d1);
         });
 
-        var occurrence2 = getNextOccurrence(startDate, rec.Interval, rec.Type);
-        test('Next occurrence should be at ' + occurrence2, function () {
-            compareNextOccurrence(rec, occurrence2, startDate);
+
+        var d2 = getDate(2015, 8, 23, 11, 26);
+        test('Next occurrence should be at occurrence should be at Sep 23 2015, 11:26 PM', function () {
+            recurrence._now = returnDate(d1);
+            compareNext(rec, d1, startTime, d2);
         });
 
-        var occurrence3 = getNextOccurrence(occurrence2, rec.Interval, rec.Type);
-        test('Next occurrence should be at ' + occurrence3, function () {
-            compareNextOccurrence(rec, occurrence3, occurrence2);
-        });
-
-        var occurrence4 = getNextOccurrence(occurrence3, rec.Interval, rec.Type);
-        test('Next occurrence should be at ' + occurrence4, function () {
-            compareNextOccurrence(rec, occurrence4, occurrence3);
-        });
-
-        var occurrence5 = getNextOccurrence(occurrence4, rec.Interval, rec.Type);
-        test('Next occurrence should be at ' + occurrence5, function () {
-            compareNextOccurrence(rec, occurrence5, occurrence4);
+        var d3 = getDate(2015, 8, 23, 12, 11);
+        test('Next occurrence should be at occurrence should be at Sep 23 2015, 12:11 PM', function () {
+            recurrence._now = returnDate(d2);
+            compareNext(rec, d2, startTime, d3);
         });
     });
 
-    suite('Every 40 days starts at 00:00', function () {
-        var rec = {};
-        rec.Type = 3;
-        rec.Interval = 40;
-        rec.Day = 1;
+    suite('Every 40 days starts at 15:00', function () {
+        var rec = {
+            Type: 3, //days
+            Interval: 40
+        };
+
         var startDate = getNow().startOf('minutes').toDate();
+        var startTime = getStartTime(15, 0);
 
-        test('First occurrence should be at ' + startDate, function () {
-            compareFirstOccurrence(rec, startDate);
+        var d1 = getDate(2015, 8, 23, 15, 0);
+        test('First occurrence should be at Sep 23 2015, 15:00 PM', function () {
+            compareFirst(rec, startDate, startTime, d1);
         });
 
-        var occurrence2 = getNextOccurrence(startDate, rec.Interval, rec.Type);
-        test('Next occurrence should be at ' + occurrence2, function () {
-            compareNextOccurrence(rec, occurrence2, startDate);
+        var d2 = getDate(2015, 10, 2, 15, 0);
+        test('Next occurrence should be at occurrence should be at Nov 02 2015, 15:00 PM', function () {
+            recurrence._now = returnDate(d1);
+            compareNext(rec, d1, startTime, d2);
         });
 
-        var occurrence3 = getNextOccurrence(occurrence2, rec.Interval, rec.Type);
-        test('Next occurrence should be at ' + occurrence3, function () {
-            compareNextOccurrence(rec, occurrence3, occurrence2);
+        var d3 = getDate(2015, 11, 12, 15, 0);
+        test('Next occurrence should be at occurrence should be at Dec 12 2015, 15:00 PM', function () {
+            recurrence._now = returnDate(d2);
+            compareNext(rec, d2, startTime, d3);
         });
 
-        var occurrence4 = getNextOccurrence(occurrence3, rec.Interval, rec.Type);
-        test('Next occurrence should be at ' + occurrence4, function () {
-            compareNextOccurrence(rec, occurrence4, occurrence3);
-        });
-
-        var occurrence5 = getNextOccurrence(occurrence4, rec.Interval, rec.Type);
-        test('Next occurrence should be at ' + occurrence5, function () {
-            compareNextOccurrence(rec, occurrence5, occurrence4);
+        var d4 = getDate(2016, 0, 21, 15, 0);
+        test('Next occurrence should be at occurrence should be at Jan 21 2016, 15:00 PM', function () {
+            recurrence._now = returnDate(d3);
+            compareNext(rec, d3, startTime, d4);
         });
     });
 
     suite('Every 7 months starts at the 7th', function () {
-        var rec = {};
-        rec.Type = 5;
-        rec.Interval = 7;
-        rec.Day = 7;
+        var rec = {
+            Type: 5, // months
+            Interval: 7,
+            Day: 7
+        };
+        var startDate = getNow().startOf('minutes').toDate();
+        var startTime = getStartTime(15, 3);
 
-        var firstExpectedExecution = moment([2015, 11, 07, 00, 00]).toDate();
-        test('First occurrence should be at ' + firstExpectedExecution, function () {
-            compareFirstOccurrence(rec, firstExpectedExecution);
+        var d1 = getDate(2015, 9, 7, 15, 3);
+        test('First occurrence should be at Oct 7 2015, 15:03 PM', function () {
+            compareFirst(rec, startDate, startTime, d1);
         });
 
-        var occurrence2 = getNextOccurrence(firstExpectedExecution, rec.Interval, rec.Type);
-        test('Next occurrence should be at ' + occurrence2, function () {
-            compareNextOccurrence(rec, occurrence2, firstExpectedExecution);
+        var d2 = getDate(2016, 4, 7, 15, 3);
+        test('Next occurrence should be at occurrence should be at May 7 2016, 15:03 PM', function () {
+            recurrence._now = returnDate(d1);
+            compareNext(rec, d1, startTime, d2);
         });
 
-        var occurrence3 = getNextOccurrence(occurrence2, rec.Interval, rec.Type);
-        test('Next occurrence should be at ' + occurrence3, function () {
-            compareNextOccurrence(rec, occurrence3, occurrence2);
+        var d3 = getDate(2016, 11, 7, 15, 3);
+        test('Next occurrence should be at occurrence should be at Dec 7 2016, 15:03 PM', function () {
+            recurrence._now = returnDate(d2);
+            compareNext(rec, d2, startTime, d3);
         });
 
-        var occurrence4 = getNextOccurrence(occurrence3, rec.Interval, rec.Type);
-        test('Next occurrence should be at ' + occurrence4, function () {
-            compareNextOccurrence(rec, occurrence4, occurrence3);
-        });
-
-        var occurrence5 = getNextOccurrence(occurrence4, rec.Interval, rec.Type);
-        test('Next occurrence should be at ' + occurrence5, function () {
-            compareNextOccurrence(rec, occurrence5, occurrence4);
+        var d4 = getDate(2017, 6, 7, 15, 3);
+        test('Next occurrence should be at occurrence should be at Jul 7 2017, 15:03 PM', function () {
+            recurrence._now = returnDate(d3);
+            compareNext(rec, d3, startTime, d4);
         });
     });
 
     suite('Every 6 weeks starts at the Wednesday', function () {
-        var rec = {};
-        rec.Type = 4;
-        rec.Interval = 6;
-        rec.Day = 3;
+        var rec = {
+            Type: 4, // weeks
+            Interval: 6,
+            Day: 3
+        };
+        var startDate = getNow().startOf('minutes').toDate();
+        var startTime = getStartTime(15, 3);
 
-        var firstExpectedExecution = moment([2015, 10, 18, 00, 00]).toDate();
-        test('First occurrence should be at ' + firstExpectedExecution, function () {
-            compareFirstOccurrence(rec, firstExpectedExecution);
+        var d1 = getDate(2015, 8, 23, 15, 3);
+        test('First occurrence should be at Sep 23 2015, 15:03 PM (Today)', function () {
+            compareFirst(rec, startDate, startTime, d1);
         });
 
-        var occurrence2 = getNextOccurrence(firstExpectedExecution, rec.Interval, rec.Type);
-        test('Next occurrence should be at ' + occurrence2, function () {
-            compareNextOccurrence(rec, occurrence2, firstExpectedExecution);
+        test('First occurrence should be at Sep 23 2015, 15:03 PM (Tomorrow)', function () {
+            // now it's Sep 22 2015, 10:00 PM
+            recurrence._now = returnDate( moment( getDate(2015, 8, 22, 10, 0) ) );
+
+            compareFirst(rec, startDate, startTime, d1);
         });
 
-        var occurrence3 = getNextOccurrence(occurrence2, rec.Interval, rec.Type);
-        test('Next occurrence should be at ' + occurrence3, function () {
-            compareNextOccurrence(rec, occurrence3, occurrence2);
+        var d11 = getDate(2015, 8, 30, 15, 3);
+        test('First occurrence should be at Sep 30 2015, 15:03 PM (Next week)', function () {
+            var retDate = moment(getNow()).add({ hours: 7 });
+            recurrence._now = returnDate( retDate );
+
+            compareFirst(rec, startDate, startTime, d11);
         });
 
-        var occurrence4 = getNextOccurrence(occurrence3, rec.Interval, rec.Type);
-        test('Next occurrence should be at ' + occurrence4, function () {
-            compareNextOccurrence(rec, occurrence4, occurrence3);
+        var d2 = getDate(2015, 10, 4, 15, 3);
+        test('Next occurrence should be at occurrence should be at Nov 04 2015, 15:03 PM', function () {
+            recurrence._now = returnDate(d1);
+            compareNext(rec, d1, startTime, d2);
         });
 
-        var occurrence5 = getNextOccurrence(occurrence4, rec.Interval, rec.Type);
-        test('Next occurrence should be at ' + occurrence5, function () {
-            compareNextOccurrence(rec, occurrence5, occurrence4);
+        var d3 = getDate(2015, 11, 16, 15, 3);
+        test('Next occurrence should be at occurrence should be at Dec 16 2015, 15:03 PM', function () {
+            recurrence._now = returnDate(d2);
+            compareNext(rec, d2, startTime, d3);
         });
     });
 
-    suite('Once - on New Year\'s Eve', function () {
-        var rec = {};
-        rec.Type = 0;
+    suite('Once with passed date and time - must execute immediately', function () {
+        var rec = {
+            Type: 0 // once
+        };
 
-        var startDate = getNow().startOf('minutes').toDate();
+        var startDate = getNow();
+        var startTime = getStartTime(0, 0);
 
-        var firstExpectedExecution = startDate;
-        test('First occurrence should be at ' + firstExpectedExecution, function () {
-            compareFirstOccurrence(rec, firstExpectedExecution);
+        var d1 = getDate(2015, 8, 23, 0, 0);
+        test('First occurrence should be at Sep 23 2015, 00:00 PM (Today)', function () {
+            compareFirst(rec, startDate, startTime, d1);
         });
 
-        var occurrence2 = getNextOccurrence(firstExpectedExecution, rec.Interval, rec.Type);
-        test('Next occurrence should be at ' + occurrence2, function () {
-            compareNextOccurrence(rec, occurrence2, firstExpectedExecution);
-        });
-
-        var occurrence3 = getNextOccurrence(occurrence2, rec.Interval, rec.Type);
-        test('Next occurrence should be at ' + occurrence3, function () {
-            compareNextOccurrence(rec, occurrence3, occurrence2);
-        });
-
-        var occurrence4 = getNextOccurrence(occurrence3, rec.Interval, rec.Type);
-        test('Next occurrence should be at ' + occurrence4, function () {
-            compareNextOccurrence(rec, occurrence4, occurrence3);
-        });
-
-        var occurrence5 = getNextOccurrence(occurrence4, rec.Interval, rec.Type);
-        test('Next occurrence should be at ' + occurrence5, function () {
-            compareNextOccurrence(rec, occurrence5, occurrence4);
-        });
+        // TODO: test('Once: now is before the execution start time.')
     });
 
     suite('Improvements', function() {
@@ -240,24 +244,27 @@ suite('recurrence', function () {
             Type: recurrence.Constants.Type.Once,
             Day: 1
         };
-        var startDate = moment().startOf('minutes');
 
         test('Once, Date.Now + 2 mins, First Occurrence check', function() {
-            var date = startDate.add({minutes: 2 }).toDate();
-            compareFirstOccurrence(rec, date, date);
+            var startDate = getNow();
+            var startTime = getStartTime( startDate.hour(), startDate.minutes() + 2);
+
+            var date = getNow().add({minutes: 2 }).toDate();
+            compareFirst(rec, startDate, startTime, date);
         });
 
-        /* NOT DONE YET
-        test('Before 3 hours, On every hour, Should schedule for nearest next hour', function() {
+        test('Before 3 hours, On every hour, Must schedule for 11:00', function() {
             var rec = {
-                Type: recurrence.Constants.Type.Hours,
+                Type: recurrence.Constants.Type.Hours, // every one hour
                 Interval: 1
             };
 
-            var before3Hours = getNow().add({hours: -3 });
+            var before3Hours = getNow().add({hours: -3, minutes: 30 });
+            var startTime = getStartTime(7, 0);
+            var d1 = getDate(2015, 8, 23, 11, 0);
 
-            compareNextOccurrence(rec, 'expected', before3Hours.add({ minutes: 15 }).toDate());
-        });*/
+            compareNext(rec, before3Hours, startTime, d1);
+        });
     });
 });
 

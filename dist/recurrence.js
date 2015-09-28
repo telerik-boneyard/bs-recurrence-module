@@ -16395,45 +16395,8 @@ Recurrence.prototype = {
         };
     },
 
-    _now: function() {
+    _now: function () {
         return moment();
-    },
-
-    _next: {
-        Once: function (opts) {
-            // When once, use just the start date. In case the start date is in the past, we return now();
-            return opts.fromMoment;
-        },
-
-        Minutes: function (opts) {
-            return opts.fromMoment.add({
-                minutes: opts.interval
-            });
-        },
-
-        Hours: function (opts) {
-            return opts.fromMoment.add({
-                hours: opts.interval
-            });
-        },
-
-        Days: function (opts) {
-            return opts.fromMoment.add({
-                days: opts.interval
-            });
-        },
-
-        Weeks: function (opts) {
-            return opts.fromMoment.add({
-                weeks: opts.interval
-            });
-        },
-
-        Months: function (opts) {
-            return opts.fromMoment.add({
-                months: opts.interval
-            });
-        }
     },
 
     /**
@@ -16486,21 +16449,43 @@ Recurrence.prototype = {
         };
     },
 
-    _getFirstOccurrence: function (rec, startDate) {
-        startDate = moment(startDate);
+    _getMomentUnit: function (type) {
+        var units = {
+            1: 'm',
+            2: 'h',
+            3: 'd',
+            4: 'w',
+            5: 'M'
+        };
+        return units[type];
+    },
+
+    _getFirstOccurrence: function (rec, fromDate, fromTimeInMinutes) {
+        // Convert date to Moment and clear-out the HH:MM:SS
+        fromDate = moment(fromDate).startOf('day');
+
+        // Add the minutes from the beginning
+        fromDate = fromDate.add({minutes: fromTimeInMinutes});
+
+        // Current time
+        var now = this._now();
 
         /**
          * Iterate until the Day matches the isMatch predicate
          * @param isMatch
          */
-        var findNextDate = function (isMatch) {
+        var findNextDate = function (isMatch, iterateFn) {
+            iterateFn = iterateFn || function addOneDay(d) {
+                    return d.add({
+                        days: 1
+                    });
+                };
+
             var iterationsCount = 0;
             var iterationsThreshold = 5000; // if we don't find anything in 5000 iterations, we won't find.
 
-            while (!isMatch(startDate, rec.Day)) {
-                startDate = startDate.add({
-                    days: 1
-                });
+            while (!isMatch(fromDate, rec.Day)) {
+                fromDate = iterateFn(fromDate);
 
                 iterationsCount++;
                 if (iterationsCount > iterationsThreshold) {
@@ -16509,65 +16494,67 @@ Recurrence.prototype = {
                 }
             }
 
-            return startDate.seconds(0).toDate();
+            return fromDate.toDate();
         };
 
         switch (rec.Type) {
             case constants.Type.Weeks:
-                return findNextDate(function (startDate, day) {
-                    return startDate.day() === day;
+                return findNextDate(function isDayEqual(from, day) {
+                    return from.day() === day && (now.isBefore(from) || now.isSame(from));
                 });
 
             case constants.Type.Months:
-                return findNextDate(function (startDate, day) {
-                    return startDate.date() === day;
+                return findNextDate(function isDateEqual(from, day) {
+                    return from.date() === day && (now.isBefore(from) || now.isSame(from));
                 });
 
             default:
-                return startDate.seconds(0).toDate();
+                return fromDate.toDate();
         }
     },
 
-    next: function (rec, from, isFirst) {
+    next: function (rec, fromDate, fromTimeInMinutes, isFirst) {
         var validationResult = this.validate(rec);
         if (!validationResult.Success) {
             throw new Error('Cannot calculate next on an invalid recurrence. ' + validationResult.ErrorMessage);
         }
 
-        if(isFirst) {
-            return this._getFirstOccurrence(rec, from);
+        if (isFirst) {
+            return this._getFirstOccurrence(rec, fromDate, fromTimeInMinutes);
         }
 
         var now = this._now();
-        var fromMoment = moment(from);
+        var fromMoment = moment(fromDate);
 
-        // the start date has passed so we must schedule from the current time
-        if (now.isAfter(from)) {
-            fromMoment = now;
+        if (rec.Type === constants.Type.Once) {
+            if (fromMoment.isBefore(now)) {
+                return now;
+            }
+            return fromMoment;
         }
 
-        var options = {
-            type: rec.Type,
-            interval: rec.Interval,
-            day: rec.Day,
-            fromMoment: fromMoment
+        var momentUnit = this._getMomentUnit(rec.Type);
+
+        var findNextScheduledTime = function (from, momentUnit) {
+            var iterationsCount = 0;
+            var iterationsThreshold = 100000000; //(69444 days / 190 years) in case for every 1 minute
+
+            // if From date is before current time
+            // or if from is the same as now, and we haven't iterated - we must get the next execution time
+            while (from.isBefore(now) || (from.isSame(now) && iterationsCount === 0)) {
+                from = from.add(momentUnit, rec.Interval);
+
+                iterationsCount++;
+                if (iterationsCount > iterationsThreshold) {
+                    throw new Error('Cannot calculate next time for: ' + JSON.stringify(rec) + ' with from date ' +
+                        fromDate);
+                }
+            }
+
+            return from;
         };
 
-        var typeName = constants.TypeString[options.type];
-
-        // happy debugging.
-        var nextDate = this._next[typeName](options)
-            .seconds(0);
-
-        if (options.type === constants.Type.Days ||
-            options.type === constants.Type.Weeks ||
-            options.type === constants.Type.Months) {
-            nextDate = nextDate.minutes(from.getMinutes())
-                .hours(from.getHours());
-
-            // TODO: For near future add some check if somehow the Day have not moved...
-        }
-
+        var nextDate = findNextScheduledTime(fromMoment, momentUnit);
         return nextDate.toDate();
     },
 
