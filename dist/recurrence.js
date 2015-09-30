@@ -16457,7 +16457,7 @@ Recurrence.prototype = {
             4: 'w',
             5: 'M'
         };
-        return units[type];
+        return units[+type];
     },
 
     _getFirstOccurrence: function (rec, fromDate, fromTimeInMinutes) {
@@ -16534,6 +16534,10 @@ Recurrence.prototype = {
         }
 
         var momentUnit = this.getMomentUnit(rec.Type);
+
+        if (!momentUnit) {
+            throw 'Invalid recurrence type';
+        }
 
         var findNextScheduledTime = function (from, momentUnit) {
             var iterationsCount = 0;
