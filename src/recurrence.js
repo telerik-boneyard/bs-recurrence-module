@@ -170,10 +170,10 @@ Recurrence.prototype = {
 
         if (rec.Type === constants.Type.Once) {
             if (fromMoment.isBefore(now)) {
-                return now;
+                return now.toDate();
             }
 
-            return fromMoment;
+            return fromMoment.toDate();
         }
 
         var momentUnit = this.getMomentUnit(rec.Type);
