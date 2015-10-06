@@ -58,8 +58,8 @@ Recurrence.prototype = {
                 return this._makeError('Interval is required for this type.');
             }
         } else {
-            if (!validator.isInt(interval, this._makeRange(1, 10000))) {
-                return this._makeRangeError('Interval', 1, 10000);
+            if (!validator.isInt(interval, this._makeRange(1, 1000))) {
+                return this._makeRangeError('Interval', 1, 1000);
             }
         }
 
