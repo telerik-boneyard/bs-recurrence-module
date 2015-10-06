@@ -27,7 +27,7 @@ var getDate = function getDate(year, month, day, hour, minute) {
 };
 
 var returnDate = function returnDate(date) {
-    return function() {
+    return function () {
         return date;
     }
 };
@@ -35,23 +35,23 @@ var returnDate = function returnDate(date) {
 // Now is Sep 23 2015, 10:30 AM UTC
 recurrence._now = getNow;
 
-var compareFirst = function(rec, fromDate, fromTime, expected) {
-    var actual = moment( recurrence.next(rec, fromDate, fromTime, true)).startOf('minute').toDate();
+var compareFirst = function (rec, fromDate, fromTime, expected) {
+    var actual = moment(recurrence.next(rec, fromDate, fromTime, true)).startOf('minute').toDate();
     actual.should.deepEqual(expected);
 };
 
-var compareNext = function(rec, fromDate, fromTime, expected) {
-    var actual = moment( recurrence.next(rec, fromDate, fromTime, false)).startOf('minute').toDate();
+var compareNext = function (rec, fromDate, fromTime, expected) {
+    var actual = moment(recurrence.next(rec, fromDate, fromTime, false)).startOf('minute').toDate();
     actual.should.deepEqual(expected);
 };
 
-var getStartTime = function(hours, minutes) {
+var getStartTime = function (hours, minutes) {
     return hours * 60 + minutes;
 };
 
 suite('recurrence - happy path', function () {
     // runs before every test and clears the get_now
-    setup(function() {
+    setup(function () {
         recurrence._now = getNow;
     });
 
@@ -197,15 +197,15 @@ suite('recurrence - happy path', function () {
 
         test('First occurrence should be at Sep 23 2015, 15:03 PM (Tomorrow)', function () {
             // now it's Sep 22 2015, 10:00 PM
-            recurrence._now = returnDate( moment( getDate(2015, 8, 22, 10, 0) ) );
+            recurrence._now = returnDate(moment(getDate(2015, 8, 22, 10, 0)));
 
             compareFirst(rec, startDate, startTime, d1);
         });
 
         var d11 = getDate(2015, 8, 30, 15, 3);
         test('First occurrence should be at Sep 30 2015, 15:03 PM (Next week)', function () {
-            var retDate = moment(getNow()).add({ hours: 7 });
-            recurrence._now = returnDate( retDate );
+            var retDate = moment(getNow()).add({hours: 7});
+            recurrence._now = returnDate(retDate);
 
             compareFirst(rec, startDate, startTime, d11);
         });
@@ -593,27 +593,27 @@ suite('recurrence - happy path', function () {
         });
     });
 
-    suite('Improvements', function() {
+    suite('Improvements', function () {
         var rec = {
             Type: recurrence.Constants.Type.Once,
             Day: 1
         };
 
-        test('Once, Date.Now + 2 mins, First Occurrence check', function() {
+        test('Once, Date.Now + 2 mins, First Occurrence check', function () {
             var startDate = getNow();
-            var startTime = getStartTime( startDate.hour(), startDate.minutes() + 2);
+            var startTime = getStartTime(startDate.hour(), startDate.minutes() + 2);
 
-            var date = getNow().add({minutes: 2 }).toDate();
+            var date = getNow().add({minutes: 2}).toDate();
             compareFirst(rec, startDate, startTime, date);
         });
 
-        test('Before 3 hours, On every hour, Must schedule for 11:00', function() {
+        test('Before 3 hours, On every hour, Must schedule for 11:00', function () {
             var rec = {
                 Type: recurrence.Constants.Type.Hours, // every one hour
                 Interval: 1
             };
 
-            var before3Hours = getNow().add({hours: -3, minutes: 30 });
+            var before3Hours = getNow().add({hours: -3, minutes: 30});
             var startTime = getStartTime(7, 0);
             var d1 = getDate(2015, 8, 23, 11, 0);
 
@@ -629,141 +629,152 @@ suite('describe', function () {
     };
 
     test('Every 5 minutes from Today 8:20, until 8/9/2015', function () {
-    testDescribe({
-        Recurrence: {
-            Type: recurrence.Constants.Type.Minutes,
-            Interval: 5
-        },
-        EndType: recurrence.Constants.EndType.EndDate,
-        EndValue: moment('8/9/2015', 'D/M/YYYY').toDate(),
-        StartDate: moment().hours(8).minutes(20).toDate()
-    }, this.test.title);
-});
+        testDescribe({
+            Recurrence: {
+                Type: recurrence.Constants.Type.Minutes,
+                Interval: 5
+            },
+            EndType: recurrence.Constants.EndType.EndDate,
+            EndValue: moment('8/9/2015', 'D/M/YYYY').toDate(),
+            StartDate: moment().hours(8).minutes(20).toDate()
+        }, this.test.title);
+    });
 
-test('Single execution scheduled for Today 9:29', function () {
-    testDescribe({
-        Recurrence: {
-            Type: recurrence.Constants.Type.Once
-        },
-        StartDate: moment().hours(9).minutes(29).toDate()
-    }, this.test.title);
-});
+    test('Single execution scheduled for Today 9:29', function () {
+        testDescribe({
+            Recurrence: {
+                Type: recurrence.Constants.Type.Once
+            },
+            StartDate: moment().hours(9).minutes(29).toDate()
+        }, this.test.title);
+    });
 
-test('Every 16 weeks from 10/12/2016 on Wed, until 15/12/2017', function () {
-    testDescribe({
-        Recurrence: {
-            Type: recurrence.Constants.Type.Weeks,
-            Interval: 16,
-            Day: 3
-        },
-        EndType: recurrence.Constants.EndType.EndDate,
-        EndValue: moment('15/12/2017', 'D/M/YYYY').toDate(),
-        StartDate: moment('10/12/2016', 'D/M/YYYY').toDate()
-    }, this.test.title);
-});
+    test('Every 16 weeks from 10/12/2016 on Wed, until 15/12/2017', function () {
+        testDescribe({
+            Recurrence: {
+                Type: recurrence.Constants.Type.Weeks,
+                Interval: 16,
+                Day: 3
+            },
+            EndType: recurrence.Constants.EndType.EndDate,
+            EndValue: moment('15/12/2017', 'D/M/YYYY').toDate(),
+            StartDate: moment('10/12/2016', 'D/M/YYYY').toDate()
+        }, this.test.title);
+    });
 
-test('Every 6 months from 5/11/2015 on 1st, until 6/11/2015', function () {
-    testDescribe({
-        Recurrence: {
-            Type: recurrence.Constants.Type.Months,
-            Interval: 6,
-            Day: 1
-        },
-        EndType: recurrence.Constants.EndType.EndDate,
-        EndValue: moment('6/11/2015', 'D/M/YYYY').toDate(),
-        StartDate: moment('5/11/2015', 'D/M/YYYY').toDate()
-    }, this.test.title);
-});
+    test('Every 6 months from 5/11/2015 on 1st, until 6/11/2015', function () {
+        testDescribe({
+            Recurrence: {
+                Type: recurrence.Constants.Type.Months,
+                Interval: 6,
+                Day: 1
+            },
+            EndType: recurrence.Constants.EndType.EndDate,
+            EndValue: moment('6/11/2015', 'D/M/YYYY').toDate(),
+            StartDate: moment('5/11/2015', 'D/M/YYYY').toDate()
+        }, this.test.title);
+    });
 
-test('Every 6 months from 5/11/2015 on 2nd, until Not set', function () {
-    testDescribe({
-        Recurrence: {
-            Type: recurrence.Constants.Type.Months,
-            Interval: 6,
-            Day: 2
-        },
-        StartDate: moment('5/11/2015', 'D/M/YYYY').toDate()
-    }, this.test.title);
-});
+    test('Every 6 months from 5/11/2015 on 2nd, until Not set', function () {
+        testDescribe({
+            Recurrence: {
+                Type: recurrence.Constants.Type.Months,
+                Interval: 6,
+                Day: 2
+            },
+            StartDate: moment('5/11/2015', 'D/M/YYYY').toDate()
+        }, this.test.title);
+    });
 
-test('Every 6 months from Not set until 6/11/2015', function () {
-    testDescribe({
-        Recurrence: {
-            Type: recurrence.Constants.Type.Months,
-            Interval: 6
-        },
-        EndType: recurrence.Constants.EndType.EndDate,
-        EndValue: moment('6/11/2015', 'D/M/YYYY').toDate()
-    }, this.test.title)
-});
+    test('Every 6 months from Not set until 6/11/2015', function () {
+        testDescribe({
+            Recurrence: {
+                Type: recurrence.Constants.Type.Months,
+                Interval: 6
+            },
+            EndType: recurrence.Constants.EndType.EndDate,
+            EndValue: moment('6/11/2015', 'D/M/YYYY').toDate()
+        }, this.test.title)
+    });
 
-test('Every 6 months from 5/11/2015 on Not set, until Not set', function () {
-    testDescribe({
-        Recurrence: {
-            Type: recurrence.Constants.Type.Months,
-            Interval: 6
-        },
-        StartDate: moment('5/11/2015', 'D/M/YYYY').toDate()
-    }, this.test.title);
-});
+    test('Every 6 months from 5/11/2015 on Not set, until Not set', function () {
+        testDescribe({
+            Recurrence: {
+                Type: recurrence.Constants.Type.Months,
+                Interval: 6
+            },
+            StartDate: moment('5/11/2015', 'D/M/YYYY').toDate()
+        }, this.test.title);
+    });
 
-test('Every 6 months from 5/11/2015 on Not set, until after 5 occurrences', function () {
-    testDescribe({
-        Recurrence: {
-            Type: recurrence.Constants.Type.Months,
-            Interval: 6
-        },
-        StartDate: moment('5/11/2015', 'D/M/YYYY').toDate(),
-        EndType: recurrence.Constants.EndType.NumberOfOccurences,
-        EndValue: 5
-    }, this.test.title);
-});
+    test('Every 6 months from 5/11/2015 on Not set, until after 5 occurrences', function () {
+        testDescribe({
+            Recurrence: {
+                Type: recurrence.Constants.Type.Months,
+                Interval: 6
+            },
+            StartDate: moment('5/11/2015', 'D/M/YYYY').toDate(),
+            EndType: recurrence.Constants.EndType.NumberOfOccurences,
+            EndValue: 5
+        }, this.test.title);
+    });
 
-test('Every 6 months from 5/11/2015 on Not set, until after 5 occurrences', function () {
-    testDescribe({
-        Recurrence: {
-            Type: recurrence.Constants.Type.Months,
-            Interval: 6
-        },
-        StartDate: moment('5/11/2015', 'D/M/YYYY').toDate(),
-        EndType: recurrence.Constants.EndType.NumberOfOccurences,
-        EndValue: 5
-    }, this.test.title);
-});
+    test('Every 6 months from 5/11/2015 on Not set, until after 5 occurrences', function () {
+        testDescribe({
+            Recurrence: {
+                Type: recurrence.Constants.Type.Months,
+                Interval: 6
+            },
+            StartDate: moment('5/11/2015', 'D/M/YYYY').toDate(),
+            EndType: recurrence.Constants.EndType.NumberOfOccurences,
+            EndValue: 5
+        }, this.test.title);
+    });
 
-test('Every 6 months from 5/11/2015 on 28th', function () {
-    testDescribe({
-        Recurrence: {
-            Type: recurrence.Constants.Type.Months,
-            Interval: 6,
-            Day: 28
-        },
-        StartDate: moment('5/11/2015', 'D/M/YYYY').toDate(),
-        EndType: recurrence.Constants.EndType.Unlimited
-    }, this.test.title);
-});
+    test('Every 6 months from 5/11/2015 on 28th', function () {
+        testDescribe({
+            Recurrence: {
+                Type: recurrence.Constants.Type.Months,
+                Interval: 6,
+                Day: 28
+            },
+            StartDate: moment('5/11/2015', 'D/M/YYYY').toDate(),
+            EndType: recurrence.Constants.EndType.Unlimited
+        }, this.test.title);
+    });
 
-test('Every 3 months from Today 9:29 on 3rd, until after 1 occurrences', function () {
-    testDescribe({
-        Recurrence: {
-            Type: recurrence.Constants.Type.Months,
-            Interval: 3,
-            Day: 3
-        },
-        EndType: recurrence.Constants.EndType.NumberOfOccurences,
-        EndValue: 1,
-        StartDate: moment().hours(9).minutes(29).toDate()
-    }, this.test.title);
-});
+    test('Every 3 months from Today 9:29 on 3rd, until after 1 occurrences', function () {
+        testDescribe({
+            Recurrence: {
+                Type: recurrence.Constants.Type.Months,
+                Interval: 3,
+                Day: 3
+            },
+            EndType: recurrence.Constants.EndType.NumberOfOccurences,
+            EndValue: 1,
+            StartDate: moment().hours(9).minutes(29).toDate()
+        }, this.test.title);
+    });
 
-test('Every day from Today, 9:29', function () {
-    testDescribe({
-        Recurrence: {
-            Type: recurrence.Constants.Type.Days,
-            Interval: 1
-        },
-        EndType: recurrence.Constants.EndType.Unlimited,
-        StartDate: moment().hours(9).minutes(29).toDate()
-    }, this.test.title);
-});
+    test('Every day from Today, 9:29', function () {
+        testDescribe({
+            Recurrence: {
+                Type: recurrence.Constants.Type.Days,
+                Interval: 1
+            },
+            EndType: recurrence.Constants.EndType.Unlimited,
+            StartDate: moment().hours(9).minutes(29).toDate()
+        }, this.test.title);
+    });
+
+    test('Single execution scheduled for 5/11/2015 8:20', function () {
+        console.log(moment('5/11/2015', 'D/M/YYYY').hours(8).minutes(20).toDate());
+        testDescribe({
+            Recurrence: {
+                Type: recurrence.Constants.Type.Once,
+                Interval: null
+            },
+            StartDate: moment('5/11/2015', 'D/M/YYYY').hours(8).minutes(20).toDate()
+        }, this.test.title)
+    });
 });

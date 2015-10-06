@@ -251,14 +251,18 @@ Recurrence.prototype = {
                 return startTimestamp;
             }
 
+            var todayHours = startDate.format(hoursFormat);
             if (startDate.isSame(moment(), 'day')) {
                 startTimestamp.push('Today' + tryInsertComma(commaAfterToday));
-                var todayHours = startDate.format(hoursFormat);
                 startTimestamp.push(todayHours + tryInsertComma(commaAfterHours && job.EndType !== constants.EndType.Unlimited));
             } else {
                 var formattedExecutionDate = startDate.format(dateFormat);
                 startTimestamp.push(formattedExecutionDate);
+                if (job.Recurrence.Type === constants.Type.Once) {
+                    startTimestamp.push(todayHours);
+                }
             }
+
 
             if (job.Recurrence.Type === constants.Type.Weeks ||
                 job.Recurrence.Type === constants.Type.Months) {
