@@ -549,6 +549,50 @@ suite('recurrence - happy path', function () {
         });
     });
 
+    suite('Every 2-nd month, starting at the 31-st', function () {
+        var rec = {
+            Type: 5, // months
+            Interval: 2, // every 2 months
+            Day: 31
+        };
+
+        // Today is 12.07.2015 year, at 15:30 PM
+        var today = getDate(2015, 11, 7, 15, 30);
+        recurrence._now = returnDate(today);
+
+        var startDate = moment(today).startOf('minutes').toDate();
+        var startTime = getStartTime(12, 0);
+
+        var d1 = getDate(2015, 11, 31, 12, 0);
+        test('First occurrence should be at Dec 31 2015, 08:00 PM', function () {
+            compareFirst(rec, startDate, startTime, d1);
+        });
+
+        var d2 = getDate(2016, 1, 29, 12, 0);
+        test('Next occurrence should be at occurrence should be at Feb 29 2016, 12:00 PM', function () {
+            recurrence._now = returnDate(d1);
+            compareNext(rec, d1, startTime, d2);
+        });
+
+        var d3 = getDate(2016, 3, 30, 12, 0);
+        test('Next occurrence should be at occurrence should be at Apr 30 2016, 12:00 PM', function () {
+            recurrence._now = returnDate(d2);
+            compareNext(rec, d2, startTime, d3);
+        });
+
+        var d4 = getDate(2016, 5, 30, 12, 0);
+        test('Next occurrence should be at occurrence should be at Jun 30 2016, 12:00 PM', function () {
+            recurrence._now = returnDate(d3);
+            compareNext(rec, d3, startTime, d4);
+        });
+
+        var d5 = getDate(2016, 7, 31, 12, 0);
+        test('Next occurrence should be at occurrence should be at Aug 31 2016, 12:00 PM', function () {
+            recurrence._now = returnDate(d4);
+            compareNext(rec, d4, startTime, d5);
+        });
+    });
+
     suite('Improvements', function() {
         var rec = {
             Type: recurrence.Constants.Type.Once,
