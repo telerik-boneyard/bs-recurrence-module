@@ -1,6 +1,6 @@
 {
   "name": "recurrence",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "main": "./src/recurrence.js",
   "private": true,
   "scripts": {
@@ -10,7 +10,6 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "lodash": "^3.10.1",
     "moment": "^2.10.6"
   },
   "devDependencies": {

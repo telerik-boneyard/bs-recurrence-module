@@ -1,5 +1,3 @@
-var _ = require('lodash');
-
 var type = {
     Once: 0,
     Minutes: 1,
@@ -17,5 +15,12 @@ exports = module.exports = {
         EndDate: 3
     },
 
-    TypeString: _.invert(type)
+    TypeString: {
+        0: 'Once',
+        1: 'Minutes',
+        2: 'Hours',
+        3: 'Days',
+        4: 'Weeks',
+        5: 'Months'
+    }
 };

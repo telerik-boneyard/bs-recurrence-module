@@ -93,6 +93,10 @@ Recurrence.prototype = {
         return units[+type];
     },
 
+    isMonth: function(type) {
+        return this.getMomentUnit(type) === 'M';
+    },
+
     _getFirstOccurrence: function (rec, fromDate, fromTimeInMinutes) {
         // Convert date to Moment and clear-out the HH:MM:SS
         fromDate = moment(fromDate).startOf('day');
@@ -172,6 +176,7 @@ Recurrence.prototype = {
             throw 'Invalid recurrence type';
         }
 
+        var self = this;
         var findNextScheduledTime = function (from, momentUnit) {
             var iterationsCount = 0;
             var iterationsThreshold = 100000000; //(69444 days / 190 years) in case for every 1 minute
@@ -185,6 +190,24 @@ Recurrence.prototype = {
                 if (iterationsCount > iterationsThreshold) {
                     throw new Error('Cannot calculate next time for: ' + JSON.stringify(rec) + ' with from date ' +
                         fromDate);
+                }
+            }
+
+            // In case of month, ensure it's the correct day of the month.
+            if(self.isMonth(rec.Type)) {
+                // if it's a month and its some of the latest day in the month, check to see if this is the appropriate day.
+                while(from.date() < rec.Day) {
+                    var nxtDate = moment(from);
+                    nxtDate.add({ days: 1 });
+                    if(nxtDate.month() !== from.month()) {
+                        // the current month doesn't have a Day with value rec.Day, so we'll be using
+                        // the latest one of the month which is in from now.
+                        break;
+                    }
+
+                    // It's in the same month, therefore it's safe to move to this date
+                    // it's guaranteed that the
+                    from = nxtDate;
                 }
             }
 
