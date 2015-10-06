@@ -153,8 +153,13 @@ Recurrence.prototype = {
     next: function (rec, fromDate, fromTimeInMinutes, isFirst) {
         //normalize the values for consistency
         rec.Type = +rec.Type;
-        rec.Interval = +rec.Interval;
-        rec.Day = +rec.Day;
+        if (rec.Interval) {
+            rec.Interval = +rec.Interval;
+        }
+
+        if (rec.Day) {
+            rec.Day = +rec.Day;
+        }
 
         var validationResult = this.validate(rec);
         if (!validationResult.Success) {
