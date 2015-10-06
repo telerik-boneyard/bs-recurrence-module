@@ -239,6 +239,360 @@ suite('recurrence - happy path', function () {
         // TODO: test('Once: now is before the execution start time.')
     });
 
+    suite('Every 1 month, starting at the 31-st', function () {
+        var rec = {
+            Type: 5, // months
+            Interval: 1, // single month
+            Day: 31
+        };
+
+        // Today is 10.07.2015 year, at 15:30 PM
+        var today = getDate(2015, 9, 7, 15, 30);
+        recurrence._now = returnDate(today);
+
+        var startDate = moment(today).startOf('minutes').toDate();
+        var startTime = getStartTime(12, 0);
+
+        var d1 = getDate(2015, 9, 31, 12, 0);
+        test('First occurrence should be at Oct 31 2015, 08:00 PM', function () {
+            compareFirst(rec, startDate, startTime, d1);
+        });
+
+        var d2 = getDate(2015, 10, 30, 12, 0);
+        test('Next occurrence should be at occurrence should be at Dec 31 2015, 12:00 PM', function () {
+            recurrence._now = returnDate(d1);
+            compareNext(rec, d1, startTime, d2);
+        });
+
+        var d3 = getDate(2015, 11, 31, 12, 0);
+        test('Next occurrence should be at occurrence should be at Nov 31 2015, 12:00 PM', function () {
+            recurrence._now = returnDate(d2);
+            compareNext(rec, d2, startTime, d3);
+        });
+
+        var d4 = getDate(2016, 0, 31, 12, 0);
+        test('Next occurrence should be at occurrence should be at Jan 31 2016, 12:00 PM', function () {
+            recurrence._now = returnDate(d3);
+            compareNext(rec, d3, startTime, d4);
+        });
+
+        var d5 = getDate(2016, 1, 29, 12, 0);
+        test('Next occurrence should be at occurrence should be at Feb 29 2016, 12:00 PM', function () {
+            recurrence._now = returnDate(d4);
+            compareNext(rec, d4, startTime, d5);
+        });
+
+        var d6 = getDate(2016, 2, 31, 12, 0);
+        test('Next occurrence should be at occurrence should be at Mar 31 2016, 12:00 PM', function () {
+            recurrence._now = returnDate(d5);
+            compareNext(rec, d5, startTime, d6);
+        });
+
+        var d7 = getDate(2016, 3, 30, 12, 0);
+        test('Next occurrence should be at occurrence should be at Apr 30 2016, 12:00 PM', function () {
+            recurrence._now = returnDate(d6);
+            compareNext(rec, d6, startTime, d7);
+        });
+
+        var d8 = getDate(2016, 4, 31, 12, 0);
+        test('Next occurrence should be at occurrence should be at May 30 2016, 12:00 PM', function () {
+            recurrence._now = returnDate(d7);
+            compareNext(rec, d7, startTime, d8);
+        });
+    });
+
+    suite('Every 1 month, starting at the 29-th', function () {
+        var rec = {
+            Type: 5, // months
+            Interval: 1, // single month
+            Day: 29
+        };
+
+        // Today is 10.07.2015 year, at 15:30 PM
+        var today = getDate(2015, 9, 7, 15, 30);
+        recurrence._now = returnDate(today);
+
+        var startDate = moment(today).startOf('minutes').toDate();
+        var startTime = getStartTime(12, 0);
+
+        var d1 = getDate(2015, 9, 29, 12, 0);
+        test('First occurrence should be at Oct 29 2015, 08:00 PM', function () {
+            compareFirst(rec, startDate, startTime, d1);
+        });
+
+        var d2 = getDate(2015, 10, 29, 12, 0);
+        test('Next occurrence should be at occurrence should be at Nov 29 2015, 12:00 PM', function () {
+            recurrence._now = returnDate(d1);
+            compareNext(rec, d1, startTime, d2);
+        });
+
+        var d3 = getDate(2015, 11, 29, 12, 0);
+        test('Next occurrence should be at occurrence should be at Dec 29 2015, 12:00 PM', function () {
+            recurrence._now = returnDate(d2);
+            compareNext(rec, d2, startTime, d3);
+        });
+
+        var d4 = getDate(2016, 0, 29, 12, 0);
+        test('Next occurrence should be at occurrence should be at Jan 29 2016, 12:00 PM', function () {
+            recurrence._now = returnDate(d3);
+            compareNext(rec, d3, startTime, d4);
+        });
+
+        var d5 = getDate(2016, 1, 29, 12, 0);
+        test('Next occurrence should be at occurrence should be at Feb 29 2016, 12:00 PM', function () {
+            recurrence._now = returnDate(d4);
+            compareNext(rec, d4, startTime, d5);
+        });
+
+        var d6 = getDate(2016, 2, 29, 12, 0);
+        test('Next occurrence should be at occurrence should be at Mar 29 2016, 12:00 PM', function () {
+            recurrence._now = returnDate(d5);
+            compareNext(rec, d5, startTime, d6);
+        });
+
+        var d7 = getDate(2016, 3, 29, 12, 0);
+        test('Next occurrence should be at occurrence should be at Apr 29 2016, 12:00 PM', function () {
+            recurrence._now = returnDate(d6);
+            compareNext(rec, d6, startTime, d7);
+        });
+
+        var d8 = getDate(2016, 4, 29, 12, 0);
+        test('Next occurrence should be at occurrence should be at May 29 2016, 12:00 PM', function () {
+            recurrence._now = returnDate(d7);
+            compareNext(rec, d7, startTime, d8);
+        });
+    });
+
+    suite('Every 1 month, starting at the 30-th', function () {
+        var rec = {
+            Type: 5, // months
+            Interval: 1, // single month
+            Day: 30
+        };
+
+        // Today is 10.07.2015 year, at 15:30 PM
+        var today = getDate(2015, 9, 7, 15, 30);
+        recurrence._now = returnDate(today);
+
+        var startDate = moment(today).startOf('minutes').toDate();
+        var startTime = getStartTime(12, 0);
+
+        var d1 = getDate(2015, 9, 30, 12, 0);
+        test('First occurrence should be at Oct 30 2015, 08:00 PM', function () {
+            compareFirst(rec, startDate, startTime, d1);
+        });
+
+        var d2 = getDate(2015, 10, 30, 12, 0);
+        test('Next occurrence should be at occurrence should be at Nov 30 2015, 12:00 PM', function () {
+            recurrence._now = returnDate(d1);
+            compareNext(rec, d1, startTime, d2);
+        });
+
+        var d3 = getDate(2015, 11, 30, 12, 0);
+        test('Next occurrence should be at occurrence should be at Dec 30 2015, 12:00 PM', function () {
+            recurrence._now = returnDate(d2);
+            compareNext(rec, d2, startTime, d3);
+        });
+
+        var d4 = getDate(2016, 0, 30, 12, 0);
+        test('Next occurrence should be at occurrence should be at Jan 30 2016, 12:00 PM', function () {
+            recurrence._now = returnDate(d3);
+            compareNext(rec, d3, startTime, d4);
+        });
+
+        var d5 = getDate(2016, 1, 29, 12, 0);
+        test('Next occurrence should be at occurrence should be at Feb 29 2016, 12:00 PM', function () {
+            recurrence._now = returnDate(d4);
+            compareNext(rec, d4, startTime, d5);
+        });
+
+        var d6 = getDate(2016, 2, 30, 12, 0);
+        test('Next occurrence should be at occurrence should be at Mar 30 2016, 12:00 PM', function () {
+            recurrence._now = returnDate(d5);
+            compareNext(rec, d5, startTime, d6);
+        });
+
+        var d7 = getDate(2016, 3, 30, 12, 0);
+        test('Next occurrence should be at occurrence should be at Apr 30 2016, 12:00 PM', function () {
+            recurrence._now = returnDate(d6);
+            compareNext(rec, d6, startTime, d7);
+        });
+
+        var d8 = getDate(2016, 4, 30, 12, 0);
+        test('Next occurrence should be at occurrence should be at May 30 2016, 12:00 PM', function () {
+            recurrence._now = returnDate(d7);
+            compareNext(rec, d7, startTime, d8);
+        });
+    });
+
+    suite('Every 1 month, starting at the 28-th', function () {
+        var rec = {
+            Type: 5, // months
+            Interval: 1, // single month
+            Day: 28
+        };
+
+        // Today is 10.07.2015 year, at 15:30 PM
+        var today = getDate(2015, 9, 7, 15, 30);
+        recurrence._now = returnDate(today);
+
+        var startDate = moment(today).startOf('minutes').toDate();
+        var startTime = getStartTime(12, 0);
+
+        var d1 = getDate(2015, 9, 28, 12, 0);
+        test('First occurrence should be at Oct 28 2015, 08:00 PM', function () {
+            compareFirst(rec, startDate, startTime, d1);
+        });
+
+        var d2 = getDate(2015, 10, 28, 12, 0);
+        test('Next occurrence should be at occurrence should be at Nov 28 2015, 12:00 PM', function () {
+            recurrence._now = returnDate(d1);
+            compareNext(rec, d1, startTime, d2);
+        });
+
+        var d3 = getDate(2015, 11, 28, 12, 0);
+        test('Next occurrence should be at occurrence should be at Dec 28 2015, 12:00 PM', function () {
+            recurrence._now = returnDate(d2);
+            compareNext(rec, d2, startTime, d3);
+        });
+
+        var d4 = getDate(2016, 0, 28, 12, 0);
+        test('Next occurrence should be at occurrence should be at Jan 28 2016, 12:00 PM', function () {
+            recurrence._now = returnDate(d3);
+            compareNext(rec, d3, startTime, d4);
+        });
+
+        var d5 = getDate(2016, 1, 28, 12, 0);
+        test('Next occurrence should be at occurrence should be at Feb 28 2016, 12:00 PM', function () {
+            recurrence._now = returnDate(d4);
+            compareNext(rec, d4, startTime, d5);
+        });
+
+        var d6 = getDate(2016, 2, 28, 12, 0);
+        test('Next occurrence should be at occurrence should be at Mar 28 2016, 12:00 PM', function () {
+            recurrence._now = returnDate(d5);
+            compareNext(rec, d5, startTime, d6);
+        });
+
+        var d7 = getDate(2016, 3, 28, 12, 0);
+        test('Next occurrence should be at occurrence should be at Apr 28 2016, 12:00 PM', function () {
+            recurrence._now = returnDate(d6);
+            compareNext(rec, d6, startTime, d7);
+        });
+
+        var d8 = getDate(2016, 4, 28, 12, 0);
+        test('Next occurrence should be at occurrence should be at May 28 2016, 12:00 PM', function () {
+            recurrence._now = returnDate(d7);
+            compareNext(rec, d7, startTime, d8);
+        });
+    });
+
+    suite('Every 1 month, starting at the 1-st', function () {
+        var rec = {
+            Type: 5, // months
+            Interval: 1, // single month
+            Day: 1
+        };
+
+        // Today is 10.07.2015 year, at 15:30 PM
+        var today = getDate(2015, 9, 1, 15, 30);
+        recurrence._now = returnDate(today);
+
+        var startDate = moment(today).startOf('minutes').toDate();
+        var startTime = getStartTime(12, 0);
+
+        var d1 = getDate(2015, 9, 1, 12, 0);
+        test('First occurrence should be at Oct 1 2015, 08:00 PM', function () {
+            compareFirst(rec, startDate, startTime, d1);
+        });
+
+        var d2 = getDate(2015, 10, 1, 12, 0);
+        test('Next occurrence should be at occurrence should be at Nov 1 2015, 12:00 PM', function () {
+            recurrence._now = returnDate(d1);
+            compareNext(rec, d1, startTime, d2);
+        });
+
+        var d3 = getDate(2015, 11, 1, 12, 0);
+        test('Next occurrence should be at occurrence should be at Dec 1 2015, 12:00 PM', function () {
+            recurrence._now = returnDate(d2);
+            compareNext(rec, d2, startTime, d3);
+        });
+
+        var d4 = getDate(2016, 0, 1, 12, 0);
+        test('Next occurrence should be at occurrence should be at Jan 1 2016, 12:00 PM', function () {
+            recurrence._now = returnDate(d3);
+            compareNext(rec, d3, startTime, d4);
+        });
+
+        var d5 = getDate(2016, 1, 1, 12, 0);
+        test('Next occurrence should be at occurrence should be at Feb 1 2016, 12:00 PM', function () {
+            recurrence._now = returnDate(d4);
+            compareNext(rec, d4, startTime, d5);
+        });
+
+        var d6 = getDate(2016, 2, 1, 12, 0);
+        test('Next occurrence should be at occurrence should be at Mar 1 2016, 12:00 PM', function () {
+            recurrence._now = returnDate(d5);
+            compareNext(rec, d5, startTime, d6);
+        });
+
+        var d7 = getDate(2016, 3, 1, 12, 0);
+        test('Next occurrence should be at occurrence should be at Apr 1 2016, 12:00 PM', function () {
+            recurrence._now = returnDate(d6);
+            compareNext(rec, d6, startTime, d7);
+        });
+
+        var d8 = getDate(2016, 4, 1, 12, 0);
+        test('Next occurrence should be at occurrence should be at May 1 2016, 12:00 PM', function () {
+            recurrence._now = returnDate(d7);
+            compareNext(rec, d7, startTime, d8);
+        });
+    });
+
+    suite('Every 2-nd month, starting at the 31-st', function () {
+        var rec = {
+            Type: 5, // months
+            Interval: 2, // every 2 months
+            Day: 31
+        };
+
+        // Today is 12.07.2015 year, at 15:30 PM
+        var today = getDate(2015, 11, 7, 15, 30);
+        recurrence._now = returnDate(today);
+
+        var startDate = moment(today).startOf('minutes').toDate();
+        var startTime = getStartTime(12, 0);
+
+        var d1 = getDate(2015, 11, 31, 12, 0);
+        test('First occurrence should be at Dec 31 2015, 08:00 PM', function () {
+            compareFirst(rec, startDate, startTime, d1);
+        });
+
+        var d2 = getDate(2016, 1, 29, 12, 0);
+        test('Next occurrence should be at occurrence should be at Feb 29 2016, 12:00 PM', function () {
+            recurrence._now = returnDate(d1);
+            compareNext(rec, d1, startTime, d2);
+        });
+
+        var d3 = getDate(2016, 3, 30, 12, 0);
+        test('Next occurrence should be at occurrence should be at Apr 30 2016, 12:00 PM', function () {
+            recurrence._now = returnDate(d2);
+            compareNext(rec, d2, startTime, d3);
+        });
+
+        var d4 = getDate(2016, 5, 30, 12, 0);
+        test('Next occurrence should be at occurrence should be at Jun 30 2016, 12:00 PM', function () {
+            recurrence._now = returnDate(d3);
+            compareNext(rec, d3, startTime, d4);
+        });
+
+        var d5 = getDate(2016, 7, 31, 12, 0);
+        test('Next occurrence should be at occurrence should be at Aug 31 2016, 12:00 PM', function () {
+            recurrence._now = returnDate(d4);
+            compareNext(rec, d4, startTime, d5);
+        });
+    });
+
     suite('Improvements', function() {
         var rec = {
             Type: recurrence.Constants.Type.Once,
