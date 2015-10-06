@@ -4167,6 +4167,11 @@ Recurrence.prototype = {
     },
 
     next: function (rec, fromDate, fromTimeInMinutes, isFirst) {
+        //normalize the values for consistency
+        rec.Type = +rec.Type;
+        rec.Interval = +rec.Interval;
+        rec.Day = +rec.Day;
+
         var validationResult = this.validate(rec);
         if (!validationResult.Success) {
             throw new Error('Cannot calculate next on an invalid recurrence. ' + validationResult.ErrorMessage);
@@ -4183,13 +4188,14 @@ Recurrence.prototype = {
             if (fromMoment.isBefore(now)) {
                 return now;
             }
+
             return fromMoment;
         }
 
         var momentUnit = this.getMomentUnit(rec.Type);
 
         if (!momentUnit) {
-            throw 'Invalid recurrence type';
+            throw new Error('Invalid recurrence type. ', + rec.Type);
         }
 
         var self = this;
@@ -4331,11 +4337,20 @@ Recurrence.prototype = {
         } else {
             describedJob.push('Every');
 
-            var type = constants.TypeString[job.Recurrence.Type].toLowerCase();
+            var type = (constants.TypeString[job.Recurrence.Type] || '').toLowerCase();
+            if (!type) {
+                throw new Error('Invalid recurrence type. ' + job.Recurrence.Type);
+            }
+
             if (job.Recurrence.Interval === 1) {
-                //every day, month etc.
-                var singularType = type.substring(0, type.length - 1);
-                describedJob.push(singularType);
+                if (type !== constants.TypeString[constants.Type.Once]) {
+                    //every day, month etc.
+                    var singularType = type.substring(0, type.length - 1);
+                    describedJob.push(singularType);
+                } else {
+                    //once
+                    describedJob.push(type);
+                }
             } else {
                 describedJob.push(job.Recurrence.Interval || notSet);
                 describedJob.push(type);
