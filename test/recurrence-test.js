@@ -628,7 +628,7 @@ suite('describe', function () {
         res.should.be.exactly(exp);
     };
 
-    test('Every 5 minutes from Today 8:20, until 8/9/2015', function () {
+    test('Every 5 minutes from Today 8:20 AM, until 8/9/2015', function () {
         testDescribe({
             Recurrence: {
                 Type: recurrence.Constants.Type.Minutes,
@@ -640,7 +640,19 @@ suite('describe', function () {
         }, this.test.title);
     });
 
-    test('Single execution scheduled for Today 9:29', function () {
+    test('Every 5 minutes from Today 5:40 PM, until 8/9/2015', function () {
+        testDescribe({
+            Recurrence: {
+                Type: recurrence.Constants.Type.Minutes,
+                Interval: 5
+            },
+            EndType: recurrence.Constants.EndType.EndDate,
+            EndValue: moment('8/9/2015', 'D/M/YYYY').toDate(),
+            StartDate: moment().hours(17).minutes(40).toDate()
+        }, this.test.title);
+    });
+
+    test('Single execution scheduled for Today 9:29 AM', function () {
         testDescribe({
             Recurrence: {
                 Type: recurrence.Constants.Type.Once
@@ -743,7 +755,7 @@ suite('describe', function () {
         }, this.test.title);
     });
 
-    test('Every 3 months from Today 9:29 on 3rd, until after 1 occurrences', function () {
+    test('Every 3 months from Today 9:29 AM on 3rd, until after 1 occurrences', function () {
         testDescribe({
             Recurrence: {
                 Type: recurrence.Constants.Type.Months,
@@ -756,7 +768,7 @@ suite('describe', function () {
         }, this.test.title);
     });
 
-    test('Every day from Today, 9:29', function () {
+    test('Every day from Today, 9:29 AM', function () {
         testDescribe({
             Recurrence: {
                 Type: recurrence.Constants.Type.Days,
@@ -767,7 +779,7 @@ suite('describe', function () {
         }, this.test.title);
     });
 
-    test('Single execution scheduled for 5/11/2015 8:20', function () {
+    test('Single execution scheduled for 5/11/2015 8:20 AM', function () {
         console.log(moment('5/11/2015', 'D/M/YYYY').hours(8).minutes(20).toDate());
         testDescribe({
             Recurrence: {

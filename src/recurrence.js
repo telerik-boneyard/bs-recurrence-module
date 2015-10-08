@@ -233,7 +233,7 @@ Recurrence.prototype = {
         var describedJob = [];
 
         var dateFormat = 'D/M/YYYY';
-        var hoursFormat = 'h:mm';
+        var hoursFormat = 'h:mm A';
         var notSet = 'Not set';
 
         var startDate = moment(job.StartDate);
