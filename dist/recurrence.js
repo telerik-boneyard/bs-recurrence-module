@@ -4248,7 +4248,7 @@ Recurrence.prototype = {
     describe: function (job) {
         var describedJob = [];
 
-        var dateFormat = 'D/M/YYYY';
+        var dateFormat = 'MMM DD, YYYY';
         var hoursFormat = 'h:mm A';
         var notSet = 'Not set';
 
