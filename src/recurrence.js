@@ -256,13 +256,9 @@ Recurrence.prototype = {
                 startTimestamp.push('Today' + tryInsertComma(commaAfterToday));
                 startTimestamp.push(todayHours + tryInsertComma(commaAfterHours && job.EndType !== constants.EndType.Unlimited));
             } else {
-                var formattedExecutionDate = startDate.format(dateFormat);
+                var formattedExecutionDate = startDate.format(dateFormat + ' ' + hoursFormat);
                 startTimestamp.push(formattedExecutionDate);
-                if (job.Recurrence.Type === constants.Type.Once) {
-                    startTimestamp.push(todayHours);
-                }
             }
-
 
             if (job.Recurrence.Type === constants.Type.Weeks ||
                 job.Recurrence.Type === constants.Type.Months) {
