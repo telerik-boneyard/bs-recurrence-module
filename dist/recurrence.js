@@ -4166,8 +4166,9 @@ Recurrence.prototype = {
         }
     },
 
-    next: function (rec, fromDate, fromTimeInMinutes, isFirst) {
-        //normalize the values for consistency
+    //normalizes the recurrence to a valid state
+    //modifies the passed object
+    _transformRecurrence: function (rec) {
         rec.Type = +rec.Type;
         if (rec.Interval) {
             rec.Interval = +rec.Interval;
@@ -4176,6 +4177,10 @@ Recurrence.prototype = {
         if (rec.Day) {
             rec.Day = +rec.Day;
         }
+    },
+
+    next: function (rec, fromDate, fromTimeInMinutes, isFirst) {
+        this._transformRecurrence(rec);
 
         var validationResult = this.validate(rec);
         if (!validationResult.Success) {
@@ -4246,6 +4251,8 @@ Recurrence.prototype = {
     },
 
     describe: function (job) {
+        this._transformRecurrence(job.Recurrence);
+
         var describedJob = [];
 
         var dateFormat = 'MMM DD, YYYY';
