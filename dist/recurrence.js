@@ -4171,7 +4171,7 @@ Recurrence.prototype = {
 
                 // Iterate to find the next appropriate time for execution
                 var nextDate = this.findNextScheduledTime(rec, originalFromDate, fromDate.startOf('minute'));
-                return nextDate;
+                return nextDate.toDate();
         }
     },
 
