@@ -98,6 +98,8 @@ Recurrence.prototype = {
     },
 
     _getFirstOccurrence: function (rec, fromDate, fromTimeInMinutes) {
+        var originalFromDate = fromDate;
+
         // Convert date to Moment and clear-out the HH:MM:SS
         fromDate = moment(fromDate).startOf('day');
 
@@ -146,7 +148,14 @@ Recurrence.prototype = {
                 });
 
             default:
-                return fromDate.startOf('minute').toDate();
+                // The From Date is in the future - so return it as it is.
+                if(fromDate.isAfter(now)) {
+                    return fromDate.startOf('minute').toDate();
+                }
+
+                // Iterate to find the next appropriate time for execution
+                var nextDate = this.findNextScheduledTime(rec, originalFromDate, fromDate.startOf('minute'));
+                return nextDate;
         }
     },
 
@@ -161,6 +170,50 @@ Recurrence.prototype = {
         if (rec.Day) {
             rec.Day = +rec.Day;
         }
+    },
+
+    findNextScheduledTime: function findNextScheduledTime(rec, originalFromDate, from) {
+        var momentUnit = this.getMomentUnit(rec.Type);
+
+        if (!momentUnit) {
+            throw new Error('Invalid recurrence type. ', +rec.Type);
+        }
+
+        var now = this._now();
+        var iterationsCount = 0;
+        var iterationsThreshold = 100000000; //(69444 days / 190 years) in case for every 1 minute
+
+        // if From date is before current time
+        // or if from is the same as now, and we haven't iterated - we must get the next execution time
+        while (from.isBefore(now) || (from.isSame(now) && iterationsCount === 0)) {
+            from = from.add(momentUnit, rec.Interval);
+
+            iterationsCount++;
+            if (iterationsCount > iterationsThreshold) {
+                throw new Error('Cannot calculate next time for: ' + JSON.stringify(rec) + ' with from date ' +
+                    originalFromDate);
+            }
+        }
+
+        // In case of month, ensure it's the correct day of the month.
+        if (this.isMonth(rec.Type)) {
+            // if it's a month and its some of the latest day in the month, check to see if this is the appropriate day.
+            while (from.date() < rec.Day) {
+                var nxtDate = moment(from);
+                nxtDate.add({days: 1});
+                if (nxtDate.month() !== from.month()) {
+                    // the current month doesn't have a Day with value rec.Day, so we'll be using
+                    // the latest one of the month which is in from now.
+                    break;
+                }
+
+                // It's in the same month, therefore it's safe to move to this date
+                // it's guaranteed that the
+                from = nxtDate;
+            }
+        }
+
+        return from;
     },
 
     next: function (rec, fromDate, fromTimeInMinutes, isFirst) {
@@ -186,51 +239,7 @@ Recurrence.prototype = {
             return fromMoment.toDate();
         }
 
-        var momentUnit = this.getMomentUnit(rec.Type);
-
-        if (!momentUnit) {
-            throw new Error('Invalid recurrence type. ', + rec.Type);
-        }
-
-        var self = this;
-        var findNextScheduledTime = function (from, momentUnit) {
-            var iterationsCount = 0;
-            var iterationsThreshold = 100000000; //(69444 days / 190 years) in case for every 1 minute
-
-            // if From date is before current time
-            // or if from is the same as now, and we haven't iterated - we must get the next execution time
-            while (from.isBefore(now) || (from.isSame(now) && iterationsCount === 0)) {
-                from = from.add(momentUnit, rec.Interval);
-
-                iterationsCount++;
-                if (iterationsCount > iterationsThreshold) {
-                    throw new Error('Cannot calculate next time for: ' + JSON.stringify(rec) + ' with from date ' +
-                        fromDate);
-                }
-            }
-
-            // In case of month, ensure it's the correct day of the month.
-            if(self.isMonth(rec.Type)) {
-                // if it's a month and its some of the latest day in the month, check to see if this is the appropriate day.
-                while(from.date() < rec.Day) {
-                    var nxtDate = moment(from);
-                    nxtDate.add({ days: 1 });
-                    if(nxtDate.month() !== from.month()) {
-                        // the current month doesn't have a Day with value rec.Day, so we'll be using
-                        // the latest one of the month which is in from now.
-                        break;
-                    }
-
-                    // It's in the same month, therefore it's safe to move to this date
-                    // it's guaranteed that the
-                    from = nxtDate;
-                }
-            }
-
-            return from;
-        };
-
-        var nextDate = findNextScheduledTime(fromMoment, momentUnit);
+        var nextDate = this.findNextScheduledTime(rec, fromDate, fromMoment);
         return nextDate.toDate();
     },
 
