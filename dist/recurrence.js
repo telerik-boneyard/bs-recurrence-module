@@ -4170,7 +4170,7 @@ Recurrence.prototype = {
                 }
 
                 // Iterate to find the next appropriate time for execution
-                var nextDate = this.findNextScheduledTime(rec, originalFromDate, fromDate.startOf('minute'));
+                var nextDate = this.findNextScheduledTime(rec, originalFromDate, fromDate.startOf('minute'), false);
                 return nextDate.toDate();
         }
     },
@@ -4188,7 +4188,7 @@ Recurrence.prototype = {
         }
     },
 
-    findNextScheduledTime: function findNextScheduledTime(rec, originalFromDate, from) {
+    findNextScheduledTime: function findNextScheduledTime(rec, originalFromDate, from, mustIterate) {
         var momentUnit = this.getMomentUnit(rec.Type);
 
         if (!momentUnit) {
@@ -4199,9 +4199,12 @@ Recurrence.prototype = {
         var iterationsCount = 0;
         var iterationsThreshold = 100000000; //(69444 days / 190 years) in case for every 1 minute
 
-        // if From date is before current time
+        // On NEXT OCCURRENCE: if From date is before current time
         // or if from is the same as now, and we haven't iterated - we must get the next execution time
-        while (from.isBefore(now) || (from.isSame(now) && iterationsCount === 0)) {
+        //
+        // On FIRST OCCURRENCE: we mustn't iterate for sure - it's ok to be executed NOW if it's
+        // the correct time.
+        while (from.isBefore(now) || (from.isSame(now) && iterationsCount === 0 && mustIterate)) {
             from = from.add(momentUnit, rec.Interval);
 
             iterationsCount++;
@@ -4255,7 +4258,7 @@ Recurrence.prototype = {
             return fromMoment.toDate();
         }
 
-        var nextDate = this.findNextScheduledTime(rec, fromDate, fromMoment);
+        var nextDate = this.findNextScheduledTime(rec, fromDate, fromMoment, true);
         return nextDate.toDate();
     },
 

@@ -610,6 +610,21 @@ suite('recurrence - happy path', function () {
         });
     });
 
+    suite('Every 3 minutes, first occurrence, start time in now', function() {
+        var rec = {
+            Type: 1, // Minutes
+            Interval: 3
+        };
+
+        var startDate = getNow().startOf('day').toDate();
+        var startTime = getStartTime(10, 30);
+
+        var d1 = getDate(2015, 8, 23, 10, 30);
+        test('First occurrence should be at Sep 23 2015, 10:30 AM', function () {
+            compareFirst(rec, startDate, startTime, d1);
+        });
+    });
+
     suite('Improvements', function () {
         var rec = {
             Type: recurrence.Constants.Type.Once,
