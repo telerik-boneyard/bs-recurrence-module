@@ -55,6 +55,68 @@ suite('recurrence - happy path', function () {
         recurrence._now = getNow;
     });
 
+    suite('Once - must schedule for 10:45', function() {
+        var rec = {
+            Type: 0 // Once
+        };
+
+        var startDate = getNow().startOf('day').toDate();
+        var startTime = getStartTime(10, 45);
+
+        var d1 = getDate(2015, 8, 23, 10, 45);
+        test('First occurrence should be at Sep 23 2015, 10:45 AM', function () {
+            compareFirst(rec, startDate, startTime, d1);
+        });
+    });
+
+    suite('Once - must schedule for 10:30', function() {
+        var rec = {
+            Type: 0 // Once
+        };
+
+        var startDate = getNow().startOf('day').toDate();
+        var startTime = getStartTime(10, 30);
+
+        var d1 = getDate(2015, 8, 23, 10, 30);
+        test('First occurrence at Current time - should raise an error.', function () {
+            try {
+                compareFirst(rec, startDate, startTime, d1);
+            } catch(e) {
+                e.message.should.equal('Cannot schedule a once execution in the past.');
+            }
+        });
+    });
+
+    suite('Once - must schedule for 10:30, now is 10:30:16', function() {
+        var rec = {
+            Type: 0 // Once
+        };
+
+        var startDate = getNow().startOf('day').toDate();
+        var startTime = getStartTime(10, 30);
+
+        // now is 10:30:16
+        var nowDate = moment({
+            year: 2015,
+            month: 8,
+            day: 23,
+            hour: 10,
+            minute: 30,
+            second: 16
+        }).startOf('minute').toDate();
+
+        var d1 = getDate(2015, 8, 23, 10, 30);
+
+        test('First occurrence at Current time - should raise an error.', function () {
+            recurrence._now = returnDate(nowDate);
+            try {
+                compareFirst(rec, startDate, startTime, d1);
+            } catch(e) {
+                e.message.should.equal('Cannot schedule a once execution in the past.');
+            }
+        });
+    });
+
     suite('Every 3 hours starts at 18:25', function () {
         var rec = {
             Type: 2, // Hours
@@ -619,8 +681,8 @@ suite('recurrence - happy path', function () {
         var startDate = getNow().startOf('day').toDate();
         var startTime = getStartTime(10, 30);
 
-        var d1 = getDate(2015, 8, 23, 10, 30);
-        test('First occurrence should be at Sep 23 2015, 10:30 AM', function () {
+        var d1 = getDate(2015, 8, 23, 10, 33);
+        test('First occurrence should be at Sep 23 2015, 10:33 AM', function () {
             compareFirst(rec, startDate, startTime, d1);
         });
     });

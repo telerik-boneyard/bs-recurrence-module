@@ -29,7 +29,7 @@ Recurrence.prototype = {
     },
 
     _now: function () {
-        return moment();
+        return moment().startOf('minute');
     },
 
     /**
@@ -147,6 +147,14 @@ Recurrence.prototype = {
                     return from.date() === day && (now.isBefore(from) || now.isSame(from));
                 });
 
+            case constants.Type.Once:
+                // The From Date is in the future - so return it as it is.
+                if(fromDate.isAfter(now)) {
+                    return fromDate.startOf('minute').toDate();
+                }
+
+                throw new Error('Cannot schedule a once execution in the past.');
+
             default:
                 // The From Date is in the future - so return it as it is.
                 if(fromDate.isAfter(now)) {
@@ -154,7 +162,7 @@ Recurrence.prototype = {
                 }
 
                 // Iterate to find the next appropriate time for execution
-                var nextDate = this.findNextScheduledTime(rec, originalFromDate, fromDate.startOf('minute'), false);
+                var nextDate = this.findNextScheduledTime(rec, originalFromDate, fromDate.startOf('minute'));
                 return nextDate.toDate();
         }
     },
@@ -172,23 +180,20 @@ Recurrence.prototype = {
         }
     },
 
-    findNextScheduledTime: function findNextScheduledTime(rec, originalFromDate, from, mustIterate) {
+    findNextScheduledTime: function findNextScheduledTime(rec, originalFromDate, from) {
         var momentUnit = this.getMomentUnit(rec.Type);
 
         if (!momentUnit) {
-            throw new Error('Invalid recurrence type. ', +rec.Type);
+            throw new Error('Invalid recurrence type. Type = ' + rec.Type);
         }
 
         var now = this._now();
         var iterationsCount = 0;
         var iterationsThreshold = 100000000; //(69444 days / 190 years) in case for every 1 minute
 
-        // On NEXT OCCURRENCE: if From date is before current time
+        // If From date is before current time
         // or if from is the same as now, and we haven't iterated - we must get the next execution time
-        //
-        // On FIRST OCCURRENCE: we mustn't iterate for sure - it's ok to be executed NOW if it's
-        // the correct time.
-        while (from.isBefore(now) || (from.isSame(now) && iterationsCount === 0 && mustIterate)) {
+        while (from.isBefore(now) || (from.isSame(now) && iterationsCount === 0)) {
             from = from.add(momentUnit, rec.Interval);
 
             iterationsCount++;
@@ -242,7 +247,7 @@ Recurrence.prototype = {
             return fromMoment.toDate();
         }
 
-        var nextDate = this.findNextScheduledTime(rec, fromDate, fromMoment, true);
+        var nextDate = this.findNextScheduledTime(rec, fromDate, fromMoment);
         return nextDate.toDate();
     },
 
